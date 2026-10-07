@@ -216,3 +216,30 @@ CREATE TABLE spare_parts (
 
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+-- ============================================
+-- PART INVENTORY
+-- Tracks spare-part availability at each site
+-- ============================================
+
+CREATE TABLE part_inventory (
+    inventory_id INT AUTO_INCREMENT PRIMARY KEY,
+
+    part_id INT NOT NULL,
+
+    site_id INT NOT NULL,
+
+    quantity_available INT NOT NULL DEFAULT 0,
+
+    minimum_stock_level INT NOT NULL DEFAULT 0,
+
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        ON UPDATE CURRENT_TIMESTAMP,
+
+    FOREIGN KEY (part_id)
+        REFERENCES spare_parts(part_id),
+
+    FOREIGN KEY (site_id)
+        REFERENCES sites(site_id),
+
+    UNIQUE (part_id, site_id)
+);

@@ -5,6 +5,7 @@ import ServiceRequests from "./pages/ServiceRequests";
 import Technicians from "./pages/Technicians";
 import SpareParts from "./pages/SpareParts";
 import Notifications from "./pages/Notifications";
+import SmartOperations from "./pages/SmartOperations";
 import Equipment from "./Equipment";
 import Landing from "./pages/Landing";
 
@@ -66,6 +67,10 @@ function Dashboard({ setActivePage }) {
 
             <button onClick={() => setActivePage("spare-parts")}>
               Check Spare Parts
+            </button>
+
+            <button onClick={() => setActivePage("smart-operations")}>
+              Open HiveMind Intelligence
             </button>
           </div>
         </div>
@@ -132,7 +137,6 @@ function Dashboard({ setActivePage }) {
     </div>
   );
 }
-
 
 function ServiceHistory() {
   const history = [
@@ -210,7 +214,6 @@ function ServiceHistory() {
   );
 }
 
-
 function App() {
   const [activePage, setActivePage] = useState("dashboard");
 
@@ -253,8 +256,12 @@ function App() {
       label: "Service History",
       icon: "🕘",
     },
+    {
+      id: "smart-operations",
+      label: "HiveMind Intelligence",
+      icon: "🧠",
+    },
   ];
-
 
   const renderPage = () => {
     switch (activePage) {
@@ -279,11 +286,13 @@ function App() {
       case "service-history":
         return <ServiceHistory />;
 
+      case "smart-operations":
+        return <SmartOperations />;
+
       default:
         return <Dashboard setActivePage={setActivePage} />;
     }
   };
-
 
   // Show the new landing page first
   if (showLanding) {
@@ -294,11 +303,9 @@ function App() {
     );
   }
 
-
   // Main application
   return (
     <div className="app-shell">
-
       <aside className="sidebar">
 
         <div className="brand">
@@ -311,7 +318,6 @@ function App() {
             <span>HiveMind</span>
           </div>
         </div>
-
 
         <div className="sidebar-section">
 
@@ -341,7 +347,6 @@ function App() {
 
         </div>
 
-
         <div className="sidebar-bottom">
 
           <div className="system-status">
@@ -364,7 +369,6 @@ function App() {
 
       </aside>
 
-
       <main className="main-content">
 
         <header className="topbar">
@@ -375,14 +379,12 @@ function App() {
             </span>
           </div>
 
-
           <div className="topbar-right">
 
             <span className="live-indicator">
               <span></span>
               Live
             </span>
-
 
             <div className="user-profile">
 
@@ -406,16 +408,13 @@ function App() {
 
         </header>
 
-
         <section className="content-area">
           {renderPage()}
         </section>
 
       </main>
-
     </div>
   );
 }
-
 
 export default App;

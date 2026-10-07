@@ -169,3 +169,32 @@ CREATE TABLE service_requests (
     FOREIGN KEY (required_skill_id)
         REFERENCES skills(skill_id)
 );
+-- ============================================
+-- ASSIGNMENTS
+-- Links service requests to technicians
+-- Tracks technician assignment and work progress
+-- ============================================
+
+CREATE TABLE assignments (
+    assignment_id INT AUTO_INCREMENT PRIMARY KEY,
+
+    request_id INT NOT NULL,
+
+    technician_id INT NOT NULL,
+
+    assignment_status VARCHAR(50) NOT NULL DEFAULT 'Assigned',
+
+    assigned_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+    work_started_at TIMESTAMP NULL,
+
+    work_completed_at TIMESTAMP NULL,
+
+    notes TEXT,
+
+    FOREIGN KEY (request_id)
+        REFERENCES service_requests(request_id),
+
+    FOREIGN KEY (technician_id)
+        REFERENCES technicians(technician_id)
+);

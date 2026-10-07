@@ -1,12 +1,19 @@
 from flask import Flask, jsonify, request
+from flask_cors import CORS
+
 from db.connection import get_db_connection
+
 
 app = Flask(__name__)
 
+# Allow the React frontend to communicate with Flask
+CORS(app)
 
-# --------------------------------
+
+# ---------------------------------------------------------
 # HOME
-# --------------------------------
+# ---------------------------------------------------------
+
 @app.route("/")
 def home():
     return jsonify({
@@ -14,9 +21,10 @@ def home():
     })
 
 
-# --------------------------------
-# TEST API
-# --------------------------------
+# ---------------------------------------------------------
+# BASIC API TEST
+# ---------------------------------------------------------
+
 @app.route("/api/test")
 def test():
     return jsonify({
@@ -25,9 +33,10 @@ def test():
     })
 
 
-# --------------------------------
+# ---------------------------------------------------------
 # DATABASE HEALTH CHECK
-# --------------------------------
+# ---------------------------------------------------------
+
 @app.route("/api/health/db")
 def database_health():
     try:
@@ -54,9 +63,10 @@ def database_health():
         }), 500
 
 
-# --------------------------------
+# ---------------------------------------------------------
 # GET ALL SERVICE REQUESTS
-# --------------------------------
+# ---------------------------------------------------------
+
 @app.route("/api/service-requests", methods=["GET"])
 def get_service_requests():
     try:
@@ -97,13 +107,14 @@ def get_service_requests():
         }), 500
 
 
-# --------------------------------
+# ---------------------------------------------------------
 # CREATE SERVICE REQUEST
-# --------------------------------
+# ---------------------------------------------------------
+
 @app.route("/api/service-requests", methods=["POST"])
 def create_service_request():
     try:
-        data = request.get_json()
+        data = request.get_json() or {}
 
         machine_id = data.get("machine_id")
         requested_by = data.get("requested_by")
@@ -112,11 +123,13 @@ def create_service_request():
         required_skill_id = data.get("required_skill_id")
         sla_deadline = data.get("sla_deadline")
 
-        # Validate required fields
         if not machine_id or not requested_by or not issue_description:
             return jsonify({
                 "success": False,
-                "message": "machine_id, requested_by, and issue_description are required"
+                "message": (
+                    "machine_id, requested_by, and "
+                    "issue_description are required"
+                )
             }), 400
 
         conn = get_db_connection()
@@ -161,12 +174,10 @@ def create_service_request():
         }), 500
 
 
-# --------------------------------
-# START SERVER
-# --------------------------------
-# --------------------------------
+# ---------------------------------------------------------
 # GET ALL MACHINES
-# --------------------------------
+# ---------------------------------------------------------
+
 @app.route("/api/machines", methods=["GET"])
 def get_machines():
     try:
@@ -187,7 +198,8 @@ def get_machines():
                 s.city,
                 m.created_at
             FROM machines m
-            JOIN sites s ON m.site_id = s.site_id
+            JOIN sites s
+                ON m.site_id = s.site_id
             ORDER BY m.machine_id
         """)
 
@@ -208,9 +220,11 @@ def get_machines():
             "error": str(e)
         }), 500
 
-# --------------------------------
+
+# ---------------------------------------------------------
 # GET ALL TECHNICIANS
-# --------------------------------
+# ---------------------------------------------------------
+
 @app.route("/api/technicians", methods=["GET"])
 def get_technicians():
     try:
@@ -230,7 +244,8 @@ def get_technicians():
                 t.longitude,
                 t.created_at
             FROM technicians t
-            JOIN users u ON t.user_id = u.user_id
+            JOIN users u
+                ON t.user_id = u.user_id
             ORDER BY t.technician_id
         """)
 
@@ -249,17 +264,22 @@ def get_technicians():
         return jsonify({
             "success": False,
             "error": str(e)
-        }), 500 
-# --------------------------------
+        }), 500
+
+
+# ---------------------------------------------------------
 # FIND MATCHING TECHNICIANS
-# --------------------------------
-@app.route("/api/service-requests/<int:request_id>/matching-technicians", methods=["GET"])
+# ---------------------------------------------------------
+
+@app.route(
+    "/api/service-requests/<int:request_id>/matching-technicians",
+    methods=["GET"]
+)
 def find_matching_technicians(request_id):
     try:
         conn = get_db_connection()
         cursor = conn.cursor(dictionary=True)
 
-        # Find the required skill for this service request
         cursor.execute("""
             SELECT
                 request_id,
@@ -287,11 +307,13 @@ def find_matching_technicians(request_id):
 
             return jsonify({
                 "success": True,
-                "message": "No required skill specified for this service request",
+                "message": (
+                    "No required skill specified "
+                    "for this service request"
+                ),
                 "matching_technicians": []
             })
 
-        # Find available technicians with the required skill
         cursor.execute("""
             SELECT
                 t.technician_id,
@@ -341,16 +363,23 @@ def find_matching_technicians(request_id):
             "success": False,
             "error": str(e)
         }), 500
-# --------------------------------
-# ASSIGN TECHNICIAN TO SERVICE REQUEST
-# --------------------------------
-@app.route("/api/service-requests/<int:request_id>/assign", methods=["POST"])
+
+
+# ---------------------------------------------------------
+# ASSIGN TECHNICIAN
+# ---------------------------------------------------------
+
+@app.route(
+    "/api/service-requests/<int:request_id>/assign",
+    methods=["POST"]
+)
 def assign_technician(request_id):
     conn = None
     cursor = None
 
     try:
         data = request.get_json() or {}
+
         technician_id = data.get("technician_id")
         notes = data.get("notes")
 
@@ -363,7 +392,7 @@ def assign_technician(request_id):
         conn = get_db_connection()
         cursor = conn.cursor(dictionary=True)
 
-        # 1. Check service request
+        # Get service request
         cursor.execute("""
             SELECT
                 request_id,
@@ -387,7 +416,7 @@ def assign_technician(request_id):
                 "message": "Service request is not pending"
             }), 400
 
-        # 2. Check technician and required skill
+        # Get technician and check required skill
         cursor.execute("""
             SELECT
                 t.technician_id,
@@ -422,10 +451,13 @@ def assign_technician(request_id):
             if technician["skill_id"] is None:
                 return jsonify({
                     "success": False,
-                    "message": "Technician does not have the required skill"
+                    "message": (
+                        "Technician does not have "
+                        "the required skill"
+                    )
                 }), 400
 
-        # 3. Create assignment
+        # Create assignment
         cursor.execute("""
             INSERT INTO assignments (
                 request_id,
@@ -442,14 +474,14 @@ def assign_technician(request_id):
 
         assignment_id = cursor.lastrowid
 
-        # 4. Update service request status
+        # Update request
         cursor.execute("""
             UPDATE service_requests
             SET status = 'Assigned'
             WHERE request_id = %s
         """, (request_id,))
 
-        # 5. Update technician availability
+        # Update technician
         cursor.execute("""
             UPDATE technicians
             SET availability_status = 'Busy'
@@ -481,10 +513,16 @@ def assign_technician(request_id):
 
         if conn:
             conn.close()
-# --------------------------------
-# START WORK ON ASSIGNMENT
-# --------------------------------
-@app.route("/api/assignments/<int:assignment_id>/start", methods=["POST"])
+
+
+# ---------------------------------------------------------
+# START ASSIGNMENT
+# ---------------------------------------------------------
+
+@app.route(
+    "/api/assignments/<int:assignment_id>/start",
+    methods=["POST"]
+)
 def start_assignment_work(assignment_id):
     conn = None
     cursor = None
@@ -493,7 +531,6 @@ def start_assignment_work(assignment_id):
         conn = get_db_connection()
         cursor = conn.cursor(dictionary=True)
 
-        # Check assignment
         cursor.execute("""
             SELECT
                 assignment_id,
@@ -515,10 +552,12 @@ def start_assignment_work(assignment_id):
         if assignment["assignment_status"] != "Assigned":
             return jsonify({
                 "success": False,
-                "message": "Assignment must be in Assigned status to start work"
+                "message": (
+                    "Assignment must be in Assigned "
+                    "status to start work"
+                )
             }), 400
 
-        # Update assignment
         cursor.execute("""
             UPDATE assignments
             SET
@@ -527,7 +566,6 @@ def start_assignment_work(assignment_id):
             WHERE assignment_id = %s
         """, (assignment_id,))
 
-        # Update service request
         cursor.execute("""
             UPDATE service_requests
             SET status = 'In Progress'
@@ -558,10 +596,16 @@ def start_assignment_work(assignment_id):
 
         if conn:
             conn.close()
-# --------------------------------
-# COMPLETE WORK ON ASSIGNMENT
-# --------------------------------
-@app.route("/api/assignments/<int:assignment_id>/complete", methods=["POST"])
+
+
+# ---------------------------------------------------------
+# COMPLETE ASSIGNMENT
+# ---------------------------------------------------------
+
+@app.route(
+    "/api/assignments/<int:assignment_id>/complete",
+    methods=["POST"]
+)
 def complete_assignment_work(assignment_id):
     conn = None
     cursor = None
@@ -573,7 +617,6 @@ def complete_assignment_work(assignment_id):
         conn = get_db_connection()
         cursor = conn.cursor(dictionary=True)
 
-        # Check assignment
         cursor.execute("""
             SELECT
                 assignment_id,
@@ -595,10 +638,12 @@ def complete_assignment_work(assignment_id):
         if assignment["assignment_status"] != "In Progress":
             return jsonify({
                 "success": False,
-                "message": "Assignment must be In Progress to be completed"
+                "message": (
+                    "Assignment must be In Progress "
+                    "to be completed"
+                )
             }), 400
 
-        # Complete assignment
         cursor.execute("""
             UPDATE assignments
             SET
@@ -611,14 +656,12 @@ def complete_assignment_work(assignment_id):
             assignment_id
         ))
 
-        # Update service request
         cursor.execute("""
             UPDATE service_requests
             SET status = 'Completed'
             WHERE request_id = %s
         """, (assignment["request_id"],))
 
-        # Make technician available again
         cursor.execute("""
             UPDATE technicians
             SET availability_status = 'Available'
@@ -650,5 +693,14 @@ def complete_assignment_work(assignment_id):
         if conn:
             conn.close()
 
+
+# ---------------------------------------------------------
+# RUN FLASK
+# ---------------------------------------------------------
+
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(
+        host="127.0.0.1",
+        port=5000,
+        debug=True
+    )

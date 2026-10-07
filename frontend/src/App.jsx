@@ -1,26 +1,31 @@
+import { useEffect, useState } from "react";
 import "./App.css";
 
+const API_URL = "http://127.0.0.1:5000";
+
 function App() {
-  const requests = [
-    {
-      id: "M-104",
-      site: "Site A",
-      priority: "Urgent",
-      status: "Pending",
-    },
-    {
-      id: "M-208",
-      site: "Site B",
-      priority: "High",
-      status: "Assigned",
-    },
-    {
-      id: "M-301",
-      site: "Site C",
-      priority: "Normal",
-      status: "Active",
-    },
-  ];
+  const [requests, setRequests] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    fetch(`${API_URL}/api/service-requests`)
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("Failed to fetch service requests");
+        }
+        return response.json();
+      })
+      .then((data) => {
+        setRequests(data.service_requests || []);
+        setLoading(false);
+      })
+      .catch((err) => {
+        console.error(err);
+        setError("Could not connect to the backend.");
+        setLoading(false);
+      });
+  }, []);
 
   return (
     <div className="app">
@@ -88,26 +93,38 @@ function App() {
         <section className="stats">
           <div className="stat-card">
             <span>Pending Requests</span>
-            <strong>24</strong>
-            <small>↑ 8% from yesterday</small>
+            <strong>
+              {requests.filter((r) => r.status === "Pending").length}
+            </strong>
+            <small>From live database</small>
           </div>
 
           <div className="stat-card">
             <span>Active Services</span>
-            <strong>8</strong>
-            <small>5 technicians on site</small>
+            <strong>
+              {
+                requests.filter(
+                  (r) =>
+                    r.status === "Assigned" ||
+                    r.status === "In Progress"
+                ).length
+              }
+            </strong>
+            <small>Assigned or in progress</small>
           </div>
 
           <div className="stat-card urgent">
             <span>Urgent Issues</span>
-            <strong>3</strong>
+            <strong>
+              {requests.filter((r) => r.priority === "Urgent").length}
+            </strong>
             <small>Requires attention</small>
           </div>
 
           <div className="stat-card">
-            <span>Available Technicians</span>
-            <strong>12</strong>
-            <small>Across 4 locations</small>
+            <span>Total Requests</span>
+            <strong>{requests.length}</strong>
+            <small>From live database</small>
           </div>
         </section>
 
@@ -122,34 +139,58 @@ function App() {
               <button className="text-button">View all →</button>
             </div>
 
-            <div className="request-list">
-              {requests.map((request) => (
-                <div className="request-row" key={request.id}>
-                  <div className="machine-icon">⚙</div>
+            {loading && (
+              <p style={{ padding: "20px" }}>
+                Loading service requests...
+              </p>
+            )}
 
-                  <div className="request-info">
-                    <strong>{request.id}</strong>
-                    <span>{request.site}</span>
+            {error && (
+              <p style={{ padding: "20px", color: "red" }}>
+                {error}
+              </p>
+            )}
+
+            {!loading && !error && (
+              <div className="request-list">
+                {requests.map((request) => (
+                  <div
+                    className="request-row"
+                    key={request.request_id}
+                  >
+                    <div className="machine-icon">⚙</div>
+
+                    <div className="request-info">
+                      <strong>
+                        Request #{request.request_id}
+                      </strong>
+
+                      <span>
+                        Machine #{request.machine_id}
+                      </span>
+                    </div>
+
+                    <span
+                      className={`priority ${request.priority
+                        .toLowerCase()
+                        .replace(" ", "-")}`}
+                    >
+                      {request.priority}
+                    </span>
+
+                    <span
+                      className={`status ${request.status
+                        .toLowerCase()
+                        .replace(" ", "-")}`}
+                    >
+                      {request.status}
+                    </span>
+
+                    <button className="arrow-button">→</button>
                   </div>
-
-                  <span
-                    className={`priority ${request.priority.toLowerCase()}`}
-                  >
-                    {request.priority}
-                  </span>
-
-                  <span
-                    className={`status ${request.status
-                      .toLowerCase()
-                      .replace(" ", "-")}`}
-                  >
-                    {request.status}
-                  </span>
-
-                  <button className="arrow-button">→</button>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
+            )}
           </div>
 
           <div className="panel alerts-panel">
@@ -166,7 +207,7 @@ function App() {
               <div className="alert-icon">!</div>
               <div>
                 <strong>Technician unavailable</strong>
-                <span>M-104 · Site A</span>
+                <span>Robotics request · Site C</span>
               </div>
             </div>
 
@@ -174,7 +215,7 @@ function App() {
               <div className="alert-icon">!</div>
               <div>
                 <strong>Spare part running low</strong>
-                <span>Motor Coupling · 2 remaining</span>
+                <span>Robot Sensor · 3 remaining</span>
               </div>
             </div>
 
@@ -182,7 +223,7 @@ function App() {
               <div className="alert-icon">!</div>
               <div>
                 <strong>SLA approaching</strong>
-                <span>M-208 · 45 minutes remaining</span>
+                <span>CNC request · High priority</span>
               </div>
             </div>
           </div>

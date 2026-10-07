@@ -89,26 +89,38 @@ function App() {
         <section className="stats">
           <div className="stat-card">
             <span>Pending Requests</span>
-            <strong>24</strong>
-            <small>↑ 8% from yesterday</small>
+            <strong>
+              {requests.filter((r) => r.status === "Pending").length}
+            </strong>
+            <small>From live database</small>
           </div>
 
           <div className="stat-card">
             <span>Active Services</span>
-            <strong>8</strong>
-            <small>5 technicians on site</small>
+            <strong>
+              {
+                requests.filter(
+                  (r) =>
+                    r.status === "Assigned" ||
+                    r.status === "In Progress"
+                ).length
+              }
+            </strong>
+            <small>Assigned or in progress</small>
           </div>
 
           <div className="stat-card urgent">
             <span>Urgent Issues</span>
-            <strong>3</strong>
+            <strong>
+              {requests.filter((r) => r.priority === "Urgent").length}
+            </strong>
             <small>Requires attention</small>
           </div>
 
           <div className="stat-card">
-            <span>Available Technicians</span>
-            <strong>12</strong>
-            <small>Across 4 locations</small>
+            <span>Total Requests</span>
+            <strong>{requests.length}</strong>
+            <small>From live database</small>
           </div>
         </section>
 
@@ -188,7 +200,7 @@ function App() {
 
               <div>
                 <strong>Technician unavailable</strong>
-                <span>M-104 · Site A</span>
+                <span>Robotics request · Site C</span>
               </div>
             </div>
 
@@ -576,4 +588,4 @@ function App() {
   );
 }
 
-export default App;
+export default App; 

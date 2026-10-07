@@ -1,194 +1,478 @@
-import "./Equipment.css";
+import { useEffect, useState } from "react";
+import "./pages/HiveMindPage.css";
+
+
+const API_BASE =
+  import.meta.env.VITE_API_URL ||
+  "http://localhost:5000";
+
 
 function Equipment() {
-  const equipment = [
-    {
-      id: "EQ-001",
-      name: "CNC Milling Machine",
-      type: "CNC Machine",
-      location: "Site A",
-      status: "Operational",
-      lastService: "02 Oct 2026",
-      nextService: "02 Nov 2026",
-    },
-    {
-      id: "EQ-002",
-      name: "Hydraulic Press",
-      type: "Press Machine",
-      location: "Site B",
-      status: "Operational",
-      lastService: "28 Sep 2026",
-      nextService: "28 Oct 2026",
-    },
-    {
-      id: "EQ-003",
-      name: "Industrial Generator",
-      type: "Generator",
-      location: "Site A",
-      status: "Under Maintenance",
-      lastService: "25 Sep 2026",
-      nextService: "10 Oct 2026",
-    },
-    {
-      id: "EQ-004",
-      name: "Air Compressor",
-      type: "Compressor",
-      location: "Site C",
-      status: "Operational",
-      lastService: "20 Sep 2026",
-      nextService: "20 Oct 2026",
-    },
-    {
-      id: "EQ-005",
-      name: "Cooling System",
-      type: "Cooling Equipment",
-      location: "Site D",
-      status: "Needs Attention",
-      lastService: "15 Sep 2026",
-      nextService: "08 Oct 2026",
-    },
-    {
-      id: "EQ-006",
-      name: "Conveyor System",
-      type: "Material Handling",
-      location: "Site B",
-      status: "Operational",
-      lastService: "12 Sep 2026",
-      nextService: "12 Oct 2026",
-    },
-  ];
+
+  const [equipment, setEquipment] =
+    useState([]);
+
+  const [loading, setLoading] =
+    useState(true);
+
+  const [error, setError] =
+    useState("");
+
+  const [search, setSearch] =
+    useState("");
+
+
+  const loadEquipment = async () => {
+
+    try {
+
+      setLoading(true);
+
+      const response = await fetch(
+        `${API_BASE}/api/machines`
+      );
+
+      if (!response.ok) {
+        throw new Error(
+          "Unable to load equipment"
+        );
+      }
+
+      const data =
+        await response.json();
+
+      setEquipment(
+        data.machines ||
+        data.equipment ||
+        data.data ||
+        []
+      );
+
+      setError("");
+
+    } catch (err) {
+
+      setError(err.message);
+
+    } finally {
+
+      setLoading(false);
+
+    }
+
+  };
+
+
+  useEffect(() => {
+    loadEquipment();
+  }, []);
+
+
+  const filteredEquipment =
+    equipment.filter((machine) => {
+
+      const text = `
+
+        ${machine.machine_name || ""}
+
+        ${machine.machine_code || ""}
+
+        ${machine.machine_type || ""}
+
+        ${machine.model || ""}
+
+        ${machine.site_name || ""}
+
+        ${machine.city || ""}
+
+      `.toLowerCase();
+
+      return text.includes(
+        search.toLowerCase()
+      );
+
+    });
+
+
+  const operational =
+    equipment.filter(
+      (machine) =>
+        String(
+          machine.status || ""
+        ).toLowerCase() ===
+        "operational"
+    ).length;
+
+
+  const attention =
+    equipment.length -
+    operational;
+
 
   return (
-    <main className="equipment-page">
-      {/* Page Header */}
-      <div className="equipment-header">
+
+    <div className="hm-page">
+
+      <div className="hm-header">
+
         <div>
-          <p className="equipment-eyebrow">ASSET MANAGEMENT</p>
-          <h1>Equipment</h1>
-          <p className="equipment-subtitle">
-            Manage and monitor all equipment across your service locations.
+
+          <span className="hm-kicker">
+            ASSET MANAGEMENT / 03
+          </span>
+
+          <h1>
+            Equipment
+          </h1>
+
+          <p>
+            Live machine status, health and maintenance
+            intelligence across operational sites.
           </p>
+
         </div>
 
-        <button className="add-equipment-button">
-          + Add Equipment
+
+        <button className="hm-button">
+          + ADD ASSET
         </button>
+
       </div>
 
-      {/* Summary Cards */}
-      <section className="equipment-stats">
-        <div className="equipment-stat-card">
-          <span>Total Equipment</span>
-          <strong>24</strong>
-          <small>Across 4 locations</small>
+
+      <div className="hm-grid hm-grid-4">
+
+        <div className="hm-metric">
+
+          <span className="hm-metric-label">
+            TOTAL ASSETS
+          </span>
+
+          <strong className="hm-metric-value">
+            {equipment.length}
+          </strong>
+
+          <span className="hm-metric-note">
+            Connected machines
+          </span>
+
         </div>
 
-        <div className="equipment-stat-card">
-          <span>Operational</span>
-          <strong>18</strong>
-          <small>75% of total equipment</small>
+
+        <div className="hm-metric">
+
+          <span className="hm-metric-label">
+            OPERATIONAL
+          </span>
+
+          <strong className="hm-metric-value">
+            {operational}
+          </strong>
+
+          <span className="hm-metric-note">
+            Currently operational
+          </span>
+
         </div>
 
-        <div className="equipment-stat-card">
-          <span>Under Maintenance</span>
-          <strong>4</strong>
-          <small>Currently being serviced</small>
+
+        <div className="hm-metric">
+
+          <span className="hm-metric-label">
+            ATTENTION
+          </span>
+
+          <strong className="hm-metric-value hm-warning">
+            {attention}
+          </strong>
+
+          <span className="hm-metric-note">
+            Requires review
+          </span>
+
         </div>
 
-        <div className="equipment-stat-card equipment-stat-warning">
-          <span>Needs Attention</span>
-          <strong>2</strong>
-          <small>Requires immediate review</small>
-        </div>
-      </section>
 
-      {/* Equipment Table */}
-      <section className="equipment-panel">
-        <div className="equipment-panel-header">
+        <div className="hm-metric">
+
+          <span className="hm-metric-label">
+            SYSTEM HEALTH
+          </span>
+
+          <strong className="hm-metric-value">
+            92%
+          </strong>
+
+          <span className="hm-metric-note">
+            HiveMind estimate
+          </span>
+
+        </div>
+
+      </div>
+
+
+      <div
+        className="hm-panel"
+        style={{ marginTop: "14px" }}
+      >
+
+        <div className="hm-panel-header">
+
           <div>
-            <p className="equipment-eyebrow">EQUIPMENT LIST</p>
-            <h2>All Equipment</h2>
+
+            <span className="hm-panel-label">
+              ASSET MATRIX
+            </span>
+
+            <h2>
+              Machine Registry
+            </h2>
+
           </div>
 
-          <div className="equipment-controls">
-            <input
-              type="text"
-              placeholder="Search equipment..."
-              className="equipment-search"
+
+          <input
+            placeholder="SEARCH MACHINE..."
+            value={search}
+            onChange={(event) =>
+              setSearch(event.target.value)
+            }
+            style={{
+              maxWidth: "240px"
+            }}
+          />
+
+        </div>
+
+
+        {loading && (
+          <p>
+            Loading equipment...
+          </p>
+        )}
+
+
+        {error && (
+
+          <div
+            style={{
+              color: "#ff4d4d",
+              border: "1px solid #ff4d4d",
+              padding: "15px"
+            }}
+          >
+            {error}
+          </div>
+
+        )}
+
+
+        {!loading &&
+          filteredEquipment.map((machine) => (
+
+            <div
+              className="hm-data-row"
+              key={
+                machine.machine_id ||
+                machine.id
+              }
+            >
+
+              <div>
+
+                <span className="hm-data-label">
+                  MACHINE
+                </span>
+
+                <div className="hm-data-value">
+
+                  {
+                    machine.machine_name ||
+                    machine.machine_code ||
+                    "UNKNOWN MACHINE"
+                  }
+
+                </div>
+
+                <small
+                  style={{
+                    color: "#555"
+                  }}
+                >
+                  {
+                    machine.machine_code ||
+                    `ID ${
+                      machine.machine_id ||
+                      "—"
+                    }`
+                  }
+                </small>
+
+              </div>
+
+
+              <div>
+
+                <span className="hm-data-label">
+                  TYPE
+                </span>
+
+                <div className="hm-data-value">
+                  {
+                    machine.machine_type ||
+                    "—"
+                  }
+                </div>
+
+              </div>
+
+
+              <div>
+
+                <span className="hm-data-label">
+                  LOCATION
+                </span>
+
+                <div className="hm-data-value">
+                  {
+                    machine.site_name ||
+                    machine.city ||
+                    "—"
+                  }
+                </div>
+
+              </div>
+
+
+              <div>
+
+                <span className="hm-data-label">
+                  STATUS
+                </span>
+
+                <span
+                  className={`hm-status ${
+                    String(
+                      machine.status ||
+                      ""
+                    ).toLowerCase() ===
+                    "operational"
+                      ? "hm-good"
+                      : "hm-warning"
+                  }`}
+                >
+                  {
+                    machine.status ||
+                    "UNKNOWN"
+                  }
+                </span>
+
+              </div>
+
+            </div>
+
+          ))}
+
+
+        {!loading &&
+          filteredEquipment.length === 0 && (
+
+            <div
+              style={{
+                textAlign: "center",
+                padding: "35px",
+                color: "#777"
+              }}
+            >
+              NO MACHINES FOUND
+            </div>
+
+          )}
+
+      </div>
+
+
+      <div
+        className="hm-grid hm-grid-2"
+        style={{ marginTop: "14px" }}
+      >
+
+        <div className="hm-panel">
+
+          <span className="hm-panel-label">
+            HIVEMIND HEALTH ENGINE
+          </span>
+
+          <h2>
+            M-102
+          </h2>
+
+          <p>
+            CNC Machine
+          </p>
+
+          <strong
+            className="hm-metric-value hm-risk"
+          >
+            54%
+          </strong>
+
+          <p>
+            Predicted maintenance risk.
+          </p>
+
+          <div className="hm-progress">
+            <span
+              style={{
+                width: "54%"
+              }}
             />
-
-            <select className="equipment-filter" defaultValue="All">
-              <option value="All">All Status</option>
-              <option value="Operational">Operational</option>
-              <option value="Under Maintenance">
-                Under Maintenance
-              </option>
-              <option value="Needs Attention">
-                Needs Attention
-              </option>
-            </select>
           </div>
+
         </div>
 
-        <div className="equipment-table-wrapper">
-          <table className="equipment-table">
-            <thead>
-              <tr>
-                <th>Equipment</th>
-                <th>Type</th>
-                <th>Location</th>
-                <th>Status</th>
-                <th>Last Service</th>
-                <th>Next Service</th>
-                <th>Action</th>
-              </tr>
-            </thead>
 
-            <tbody>
-              {equipment.map((item) => (
-                <tr key={item.id}>
-                  <td>
-                    <div className="equipment-name">
-                      <div className="equipment-icon">⚙</div>
+        <div className="hm-panel">
 
-                      <div>
-                        <strong>{item.name}</strong>
-                        <span>{item.id}</span>
-                      </div>
-                    </div>
-                  </td>
+          <span className="hm-panel-label">
+            HEALTHIEST ASSET
+          </span>
 
-                  <td>{item.type}</td>
+          <h2>
+            M-104
+          </h2>
 
-                  <td>{item.location}</td>
+          <p>
+            Hydraulic Press
+          </p>
 
-                  <td>
-                    <span
-                      className={`equipment-status ${item.status
-                        .toLowerCase()
-                        .replaceAll(" ", "-")}`}
-                    >
-                      {item.status}
-                    </span>
-                  </td>
+          <strong
+            className="hm-metric-value hm-good"
+          >
+            92%
+          </strong>
 
-                  <td>{item.lastService}</td>
+          <p>
+            Current estimated machine health.
+          </p>
 
-                  <td>{item.nextService}</td>
+          <div className="hm-progress">
+            <span
+              style={{
+                width: "92%"
+              }}
+            />
+          </div>
 
-                  <td>
-                    <button className="equipment-view-button">
-                      View →
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
         </div>
-      </section>
-    </main>
+
+      </div>
+
+    </div>
+
   );
 }
+
 
 export default Equipment;

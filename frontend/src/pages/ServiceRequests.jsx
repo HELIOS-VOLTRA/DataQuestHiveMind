@@ -1,518 +1,590 @@
-import { useMemo, useState } from "react";
-import "../App.css";
+import { useEffect, useState } from "react";
+import "./HiveMindPage.css";
 
-const initialRequests = [
-  {
-    id: "SR-1024",
-    machine: "M-104",
-    site: "Site A",
-    issue: "Motor overheating",
-    priority: "Urgent",
-    status: "Pending",
-    technician: "Unassigned",
-  },
-  {
-    id: "SR-1025",
-    machine: "M-208",
-    site: "Site B",
-    issue: "Hydraulic pressure issue",
-    priority: "High",
-    status: "Assigned",
-    technician: "Rahul Kumar",
-  },
-  {
-    id: "SR-1026",
-    machine: "M-301",
-    site: "Site C",
-    issue: "Routine maintenance",
-    priority: "Normal",
-    status: "Active",
-    technician: "Ananya Sharma",
-  },
-];
+
+const API_BASE =
+  import.meta.env.VITE_API_URL ||
+  "http://localhost:5000";
+
 
 function ServiceRequests() {
-  const [requests, setRequests] = useState(initialRequests);
 
-  const [search, setSearch] = useState("");
-  const [priorityFilter, setPriorityFilter] = useState("All");
-  const [statusFilter, setStatusFilter] = useState("All");
+  const [requests, setRequests] =
+    useState([]);
 
-  const [selectedRequest, setSelectedRequest] = useState(null);
-  const [showCreateForm, setShowCreateForm] = useState(false);
+  const [loading, setLoading] =
+    useState(true);
 
-  const [formData, setFormData] = useState({
-    machine: "",
-    site: "",
-    issue: "",
-    priority: "Normal",
-    technician: "Unassigned",
+  const [error, setError] =
+    useState("");
+
+  const [showForm, setShowForm] =
+    useState(false);
+
+  const [form, setForm] = useState({
+    machine_id: "",
+    requested_by: "",
+    issue_description: "",
+    priority: "Medium",
+    required_skill_id: "",
+    sla_deadline: ""
   });
 
-  // --------------------------------------------------
-  // SEARCH + FILTERING
-  // --------------------------------------------------
 
-  const filteredRequests = useMemo(() => {
-    return requests.filter((request) => {
-      const searchText = search.toLowerCase();
+  const loadRequests = async () => {
 
-      const matchesSearch =
-        request.id.toLowerCase().includes(searchText) ||
-        request.machine.toLowerCase().includes(searchText) ||
-        request.site.toLowerCase().includes(searchText) ||
-        request.issue.toLowerCase().includes(searchText) ||
-        request.technician.toLowerCase().includes(searchText);
+    try {
 
-      const matchesPriority =
-        priorityFilter === "All" ||
-        request.priority === priorityFilter;
+      setLoading(true);
 
-      const matchesStatus =
-        statusFilter === "All" ||
-        request.status === statusFilter;
+      const response = await fetch(
+        `${API_BASE}/api/service-requests`
+      );
 
-      return matchesSearch && matchesPriority && matchesStatus;
-    });
-  }, [requests, search, priorityFilter, statusFilter]);
+      if (!response.ok) {
+        throw new Error(
+          "Unable to load service requests"
+        );
+      }
 
-  // --------------------------------------------------
-  // FORM HANDLING
-  // --------------------------------------------------
+      const data = await response.json();
 
-  const handleFormChange = (event) => {
-    const { name, value } = event.target;
+      const list =
+        data.service_requests ||
+        data.requests ||
+        data.data ||
+        [];
 
-    setFormData((previous) => ({
-      ...previous,
-      [name]: value,
-    }));
+      setRequests(list);
+
+      setError("");
+
+    } catch (err) {
+
+      setError(err.message);
+
+    } finally {
+
+      setLoading(false);
+
+    }
   };
 
-  const handleCreateRequest = (event) => {
+
+  useEffect(() => {
+    loadRequests();
+  }, []);
+
+
+  const handleChange = (event) => {
+
+    setForm({
+      ...form,
+      [event.target.name]:
+        event.target.value
+    });
+
+  };
+
+
+  const createRequest = async (event) => {
+
     event.preventDefault();
 
-    if (!formData.machine || !formData.site || !formData.issue) {
-      alert("Please fill in Equipment, Location and Problem.");
-      return;
+    try {
+
+      const response = await fetch(
+        `${API_BASE}/api/service-requests`,
+        {
+          method: "POST",
+
+          headers: {
+            "Content-Type":
+              "application/json"
+          },
+
+          body: JSON.stringify({
+            machine_id:
+              form.machine_id
+                ? Number(form.machine_id)
+                : null,
+
+            requested_by:
+              form.requested_by
+                ? Number(form.requested_by)
+                : null,
+
+            issue_description:
+              form.issue_description,
+
+            priority:
+              form.priority,
+
+            required_skill_id:
+              form.required_skill_id
+                ? Number(form.required_skill_id)
+                : null,
+
+            sla_deadline:
+              form.sla_deadline || null
+          })
+        }
+      );
+
+
+      const data =
+        await response.json();
+
+
+      if (!response.ok) {
+
+        throw new Error(
+          data.error ||
+          data.message ||
+          "Failed to create request"
+        );
+
+      }
+
+
+      setShowForm(false);
+
+      setForm({
+        machine_id: "",
+        requested_by: "",
+        issue_description: "",
+        priority: "Medium",
+        required_skill_id: "",
+        sla_deadline: ""
+      });
+
+
+      await loadRequests();
+
+    } catch (err) {
+
+      setError(err.message);
+
     }
 
-    const nextNumber =
-      Math.max(
-        ...requests.map((request) =>
-          Number(request.id.replace("SR-", ""))
-        )
-      ) + 1;
-
-    const newRequest = {
-      id: `SR-${nextNumber}`,
-      machine: formData.machine,
-      site: formData.site,
-      issue: formData.issue,
-      priority: formData.priority,
-      status: "Pending",
-      technician: formData.technician || "Unassigned",
-    };
-
-    setRequests((previous) => [newRequest, ...previous]);
-
-    setFormData({
-      machine: "",
-      site: "",
-      issue: "",
-      priority: "Normal",
-      technician: "Unassigned",
-    });
-
-    setShowCreateForm(false);
   };
 
+
   return (
-    <main className="main">
-      {/* ==================================================
-          HEADER
-      ================================================== */}
 
-      <header className="header">
+    <div className="hm-page">
+
+      <div className="hm-header">
+
         <div>
-          <p className="eyebrow">OPERATIONS CENTER</p>
-          <h1>Service Requests</h1>
-        </div>
 
-        <div className="header-right">
-          <button className="notification-button">
-            🔔
-          </button>
+          <span className="hm-kicker">
+            SERVICE CONTROL / 02
+          </span>
 
-          <div className="user">
-            <div className="avatar">A</div>
-
-            <div>
-              <strong>Admin User</strong>
-              <span>Operations Manager</span>
-            </div>
-          </div>
-        </div>
-      </header>
-
-      {/* ==================================================
-          PAGE INTRO
-      ================================================== */}
-
-      <section className="welcome">
-        <div>
-          <h2>Service Requests</h2>
+          <h1>
+            Service Requests
+          </h1>
 
           <p>
-            Monitor, prioritize and manage equipment service requests.
+            Centralized control of maintenance requests,
+            priorities, assignments and service progress.
           </p>
+
         </div>
+
 
         <button
-          className="primary-button"
-          onClick={() => setShowCreateForm(true)}
+          className="hm-button"
+          onClick={() =>
+            setShowForm(!showForm)
+          }
         >
-          + Create Service Request
+          {showForm
+            ? "CLOSE FORM"
+            : "+ CREATE REQUEST"}
         </button>
-      </section>
 
-      {/* ==================================================
-          REQUEST LIST
-      ================================================== */}
+      </div>
 
-      <section className="panel requests-page-panel">
-        <div className="service-page-header">
-          <div>
-            <p className="eyebrow">SERVICE OPERATIONS</p>
-            <h2>All Service Requests</h2>
+
+      <div className="hm-grid hm-grid-4">
+
+        <div className="hm-metric">
+
+          <span className="hm-metric-label">
+            OPEN
+          </span>
+
+          <strong className="hm-metric-value">
+            {requests.length}
+          </strong>
+
+          <span className="hm-metric-note">
+            Active requests
+          </span>
+
+        </div>
+
+
+        <div className="hm-metric">
+
+          <span className="hm-metric-label">
+            CRITICAL
+          </span>
+
+          <strong className="hm-metric-value hm-risk">
+            {
+              requests.filter(
+                (item) =>
+                  String(
+                    item.priority || ""
+                  ).toLowerCase() ===
+                  "critical"
+              ).length
+            }
+          </strong>
+
+          <span className="hm-metric-note">
+            Immediate attention
+          </span>
+
+        </div>
+
+
+        <div className="hm-metric">
+
+          <span className="hm-metric-label">
+            ASSIGNED
+          </span>
+
+          <strong className="hm-metric-value">
+            {
+              requests.filter(
+                (item) =>
+                  item.technician_id ||
+                  item.assigned_technician_id
+              ).length
+            }
+          </strong>
+
+          <span className="hm-metric-note">
+            Workforce assigned
+          </span>
+
+        </div>
+
+
+        <div className="hm-metric">
+
+          <span className="hm-metric-label">
+            PENDING
+          </span>
+
+          <strong className="hm-metric-value hm-warning">
+            {
+              requests.filter(
+                (item) =>
+                  String(
+                    item.status || ""
+                  ).toLowerCase() ===
+                  "pending"
+              ).length
+            }
+          </strong>
+
+          <span className="hm-metric-note">
+            Awaiting action
+          </span>
+
+        </div>
+
+      </div>
+
+
+      {showForm && (
+
+        <div
+          className="hm-panel"
+          style={{ marginTop: "14px" }}
+        >
+
+          <div className="hm-panel-header">
+
+            <div>
+
+              <span className="hm-panel-label">
+                NEW SERVICE REQUEST
+              </span>
+
+              <h2>
+                Create Request
+              </h2>
+
+            </div>
+
           </div>
 
-          {/* FILTERS */}
 
-          <div className="request-filters">
-            <input
-              type="text"
-              placeholder="Search requests..."
-              className="search-input"
-              value={search}
-              onChange={(event) => setSearch(event.target.value)}
+          <form onSubmit={createRequest}>
+
+            <div
+              className="hm-grid hm-grid-2"
+              style={{ gap: "14px" }}
+            >
+
+              <input
+                name="machine_id"
+                type="number"
+                placeholder="MACHINE ID"
+                value={form.machine_id}
+                onChange={handleChange}
+                required
+              />
+
+
+              <input
+                name="requested_by"
+                type="number"
+                placeholder="REQUESTED BY USER ID"
+                value={form.requested_by}
+                onChange={handleChange}
+                required
+              />
+
+
+              <select
+                name="priority"
+                value={form.priority}
+                onChange={handleChange}
+              >
+
+                <option value="Low">
+                  LOW
+                </option>
+
+                <option value="Medium">
+                  MEDIUM
+                </option>
+
+                <option value="High">
+                  HIGH
+                </option>
+
+                <option value="Critical">
+                  CRITICAL
+                </option>
+
+              </select>
+
+
+              <input
+                name="required_skill_id"
+                type="number"
+                placeholder="REQUIRED SKILL ID"
+                value={form.required_skill_id}
+                onChange={handleChange}
+              />
+
+
+              <input
+                name="sla_deadline"
+                type="datetime-local"
+                value={form.sla_deadline}
+                onChange={handleChange}
+              />
+
+            </div>
+
+
+            <textarea
+              name="issue_description"
+              placeholder="DESCRIBE THE EQUIPMENT ISSUE..."
+              value={form.issue_description}
+              onChange={handleChange}
+              required
+              rows="5"
+              style={{
+                width: "100%",
+                marginTop: "14px"
+              }}
             />
 
-            <select
-              className="filter-select"
-              value={priorityFilter}
-              onChange={(event) =>
-                setPriorityFilter(event.target.value)
-              }
-            >
-              <option value="All">All Priorities</option>
-              <option value="Urgent">Urgent</option>
-              <option value="High">High</option>
-              <option value="Normal">Normal</option>
-            </select>
 
-            <select
-              className="filter-select"
-              value={statusFilter}
-              onChange={(event) =>
-                setStatusFilter(event.target.value)
-              }
+            <button
+              type="submit"
+              className="hm-button"
+              style={{ marginTop: "14px" }}
             >
-              <option value="All">All Statuses</option>
-              <option value="Pending">Pending</option>
-              <option value="Assigned">Assigned</option>
-              <option value="Active">Active</option>
-              <option value="Completed">Completed</option>
-            </select>
+              CREATE REQUEST
+            </button>
+
+          </form>
+
+        </div>
+
+      )}
+
+
+      <div
+        className="hm-panel"
+        style={{ marginTop: "14px" }}
+      >
+
+        <div className="hm-panel-header">
+
+          <div>
+
+            <span className="hm-panel-label">
+              LIVE SERVICE BOARD
+            </span>
+
+            <h2>
+              Active Requests
+            </h2>
+
           </div>
+
         </div>
 
-        {/* REQUEST COUNT */}
 
-        <div className="request-summary">
-          Showing {filteredRequests.length} of {requests.length} requests
-        </div>
+        {loading && (
 
-        {/* REQUEST CARDS */}
+          <p>
+            Loading service requests...
+          </p>
 
-        <div className="service-request-list">
-          {filteredRequests.length > 0 ? (
-            filteredRequests.map((request) => (
-              <div
-                className="service-request-card"
-                key={request.id}
-              >
-                {/* TOP */}
+        )}
 
-                <div className="request-card-top">
-                  <div>
-                    <span className="request-id">
-                      {request.id}
-                    </span>
 
-                    <h3>
-                      {request.machine} — {request.issue}
-                    </h3>
-                  </div>
+        {error && (
 
-                  <span
-                    className={`priority ${request.priority.toLowerCase()}`}
-                  >
-                    {request.priority}
-                  </span>
-                </div>
+          <div
+            style={{
+              padding: "16px",
+              border: "1px solid #ff4d4d",
+              color: "#ff4d4d",
+              marginBottom: "16px"
+            }}
+          >
+            {error}
+          </div>
 
-                {/* DETAILS */}
+        )}
 
-                <div className="request-details">
-                  <div>
-                    <span>Location</span>
-                    <strong>{request.site}</strong>
-                  </div>
 
-                  <div>
-                    <span>Technician</span>
-                    <strong>{request.technician}</strong>
-                  </div>
+        {!loading &&
+          requests.length === 0 && (
 
-                  <div>
-                    <span>Status</span>
-                    <strong>{request.status}</strong>
-                  </div>
-                </div>
-
-                {/* BOTTOM */}
-
-                <div className="request-card-bottom">
-                  <span
-                    className={`status ${request.status
-                      .toLowerCase()
-                      .replace(" ", "-")}`}
-                  >
-                    {request.status}
-                  </span>
-
-                  <button
-                    className="text-button"
-                    onClick={() =>
-                      setSelectedRequest(request)
-                    }
-                  >
-                    View Details →
-                  </button>
-                </div>
-              </div>
-            ))
-          ) : (
-            <div className="empty-state">
-              <h3>No service requests found</h3>
-
-              <p>
-                Try changing your search or filter settings.
-              </p>
-
-              <button
-                className="text-button"
-                onClick={() => {
-                  setSearch("");
-                  setPriorityFilter("All");
-                  setStatusFilter("All");
-                }}
-              >
-                Clear Filters
-              </button>
+            <div
+              style={{
+                padding: "35px",
+                textAlign: "center",
+                color: "#777"
+              }}
+            >
+              NO SERVICE REQUESTS FOUND
             </div>
+
           )}
-        </div>
-      </section>
 
-      {/* ==================================================
-          VIEW DETAILS MODAL
-      ================================================== */}
 
-      {selectedRequest && (
-        <div
-          className="modal-overlay"
-          onClick={() => setSelectedRequest(null)}
-        >
+        {requests.map((request) => (
+
           <div
-            className="modal"
-            onClick={(event) => event.stopPropagation()}
+            className="hm-data-row"
+            key={
+              request.request_id ||
+              request.id
+            }
           >
-            <div className="modal-header">
-              <div>
-                <p className="eyebrow">SERVICE REQUEST</p>
 
-                <h2>{selectedRequest.id}</h2>
+            <div>
+
+              <span className="hm-data-label">
+                REQUEST
+              </span>
+
+              <div className="hm-data-value">
+                #
+                {request.request_id ||
+                  request.id ||
+                  "—"}
               </div>
 
-              <button
-                className="modal-close"
-                onClick={() => setSelectedRequest(null)}
-              >
-                ×
-              </button>
             </div>
 
-            <div className="modal-content">
-              <h3>
-                {selectedRequest.machine} —{" "}
-                {selectedRequest.issue}
-              </h3>
 
-              <div className="modal-details">
-                <div>
-                  <span>Equipment</span>
-                  <strong>{selectedRequest.machine}</strong>
-                </div>
+            <div>
 
-                <div>
-                  <span>Location</span>
-                  <strong>{selectedRequest.site}</strong>
-                </div>
+              <span className="hm-data-label">
+                MACHINE
+              </span>
 
-                <div>
-                  <span>Priority</span>
-                  <strong>{selectedRequest.priority}</strong>
-                </div>
-
-                <div>
-                  <span>Status</span>
-                  <strong>{selectedRequest.status}</strong>
-                </div>
-
-                <div>
-                  <span>Technician</span>
-                  <strong>
-                    {selectedRequest.technician}
-                  </strong>
-                </div>
+              <div className="hm-data-value">
+                {
+                  request.machine_name ||
+                  request.machine_code ||
+                  request.machine ||
+                  `MACHINE ${
+                    request.machine_id ||
+                    "—"
+                  }`
+                }
               </div>
+
             </div>
 
-            <div className="modal-footer">
-              <button
-                className="secondary-button"
-                onClick={() => setSelectedRequest(null)}
+
+            <div>
+
+              <span className="hm-data-label">
+                PRIORITY
+              </span>
+
+              <div
+                className={`hm-data-value ${
+                  String(
+                    request.priority ||
+                    ""
+                  ).toLowerCase() ===
+                  "critical"
+                    ? "hm-risk"
+                    : ""
+                }`}
               >
-                Close
-              </button>
+                {request.priority ||
+                  "NORMAL"}
+              </div>
+
             </div>
+
+
+            <div>
+
+              <span className="hm-data-label">
+                STATUS
+              </span>
+
+              <span className="hm-status hm-good">
+                {
+                  request.status ||
+                  "PENDING"
+                }
+              </span>
+
+            </div>
+
           </div>
-        </div>
-      )}
 
-      {/* ==================================================
-          CREATE REQUEST MODAL
-      ================================================== */}
+        ))}
 
-      {showCreateForm && (
-        <div
-          className="modal-overlay"
-          onClick={() => setShowCreateForm(false)}
-        >
-          <div
-            className="modal create-modal"
-            onClick={(event) => event.stopPropagation()}
-          >
-            <div className="modal-header">
-              <div>
-                <p className="eyebrow">NEW REQUEST</p>
+      </div>
 
-                <h2>Create Service Request</h2>
-              </div>
+    </div>
 
-              <button
-                className="modal-close"
-                onClick={() => setShowCreateForm(false)}
-              >
-                ×
-              </button>
-            </div>
-
-            <form
-              className="request-form"
-              onSubmit={handleCreateRequest}
-            >
-              <label>
-                Equipment ID
-                <input
-                  name="machine"
-                  type="text"
-                  placeholder="Example: M-104"
-                  value={formData.machine}
-                  onChange={handleFormChange}
-                />
-              </label>
-
-              <label>
-                Location
-                <input
-                  name="site"
-                  type="text"
-                  placeholder="Example: Site A"
-                  value={formData.site}
-                  onChange={handleFormChange}
-                />
-              </label>
-
-              <label>
-                Problem
-                <input
-                  name="issue"
-                  type="text"
-                  placeholder="Describe the equipment issue"
-                  value={formData.issue}
-                  onChange={handleFormChange}
-                />
-              </label>
-
-              <label>
-                Priority
-                <select
-                  name="priority"
-                  value={formData.priority}
-                  onChange={handleFormChange}
-                >
-                  <option value="Urgent">Urgent</option>
-                  <option value="High">High</option>
-                  <option value="Normal">Normal</option>
-                </select>
-              </label>
-
-              <label>
-                Technician
-                <input
-                  name="technician"
-                  type="text"
-                  placeholder="Leave as Unassigned if unknown"
-                  value={formData.technician}
-                  onChange={handleFormChange}
-                />
-              </label>
-
-              <div className="modal-footer">
-                <button
-                  type="button"
-                  className="secondary-button"
-                  onClick={() => setShowCreateForm(false)}
-                >
-                  Cancel
-                </button>
-
-                <button
-                  type="submit"
-                  className="primary-button"
-                >
-                  Create Request
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
-    </main>
   );
 }
+
 
 export default ServiceRequests;

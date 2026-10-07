@@ -1,823 +1,1143 @@
-import { useMemo, useState } from "react";
-import "./SmartOperations.css";
+import { useState } from "react";
+import "./HiveMindPage.css";
 
-const technicians = [
-  {
-    name: "Arjun Kumar",
-    skill: 100,
-    availability: 95,
-    workload: 90,
-    distance: 92,
-    experience: 96,
-  },
-  {
-    name: "Priya Sharma",
-    skill: 94,
-    availability: 88,
-    workload: 82,
-    distance: 96,
-    experience: 91,
-  },
-  {
-    name: "Rahul Singh",
-    skill: 86,
-    availability: 97,
-    workload: 74,
-    distance: 80,
-    experience: 88,
-  },
-];
 
-const machines = [
-  {
-    id: "M-104",
-    name: "Hydraulic Press",
-    health: 87,
-    risk: 18,
-    temperature: "Normal",
-    vibration: "Slightly elevated",
-    pressure: "Normal",
-    maintenance: 62,
-    status: "Healthy",
-  },
-  {
-    id: "M-102",
-    name: "CNC Machine",
-    health: 54,
-    risk: 67,
-    temperature: "Normal",
-    vibration: "High",
-    pressure: "Normal",
-    maintenance: 91,
-    status: "Attention Required",
-  },
-  {
-    id: "M-103",
-    name: "Air Compressor",
-    health: 72,
-    risk: 41,
-    temperature: "Elevated",
-    vibration: "Moderate",
-    pressure: "Normal",
-    maintenance: 78,
-    status: "Monitor",
-  },
-];
+function SmartOperations() {
 
-const parts = [
-  {
-    name: "Hydraulic Seal Kit",
-    stock: 4,
-    minimum: 5,
-    predictedUsage: 6,
-    stockoutRisk: 73,
-    recommendation: "Order 8 units",
-  },
-  {
-    name: "CNC Cutting Insert",
-    stock: 18,
-    minimum: 10,
-    predictedUsage: 7,
-    stockoutRisk: 18,
-    recommendation: "No immediate action",
-  },
-  {
-    name: "Compressor Bearing",
-    stock: 3,
-    minimum: 4,
-    predictedUsage: 5,
-    stockoutRisk: 81,
-    recommendation: "Order 6 units",
-  },
-];
+  const [activeTab, setActiveTab] =
+    useState("Overview");
 
-const serviceRequests = [
-  {
-    id: "SR-1024",
-    machine: "M-104",
-    issue: "Hydraulic pressure failure",
-    deadline: "Today • 8:00 PM",
-    risk: 72,
-    completion: "7:35 PM",
-    buffer: "25 min",
-    reasons: ["Technician availability", "Spare part availability"],
-  },
-  {
-    id: "SR-1025",
-    machine: "M-102",
-    issue: "Inaccurate CNC cuts",
-    deadline: "Tomorrow • 4:00 PM",
-    risk: 12,
-    completion: "11:40 AM",
-    buffer: "4h 20m",
-    reasons: ["No major blockers"],
-  },
-  {
-    id: "SR-1026",
-    machine: "M-103",
-    issue: "Unusual vibration",
-    deadline: "Tomorrow • 6:00 PM",
-    risk: 43,
-    completion: "4:50 PM",
-    buffer: "1h 10m",
-    reasons: ["Maintenance workload"],
-  },
-];
 
-function ScoreBar({ value }) {
-  return (
-    <div className="score-bar">
-      <div
-        className="score-bar-fill"
-        style={{ width: `${value}%` }}
-      ></div>
-    </div>
-  );
-}
+  const tabs = [
+    "Overview",
+    "Technician Matching",
+    "Machine Health",
+    "Parts Intelligence",
+    "SLA Prediction",
+    "Impact Simulation"
+  ];
 
-function RiskBadge({ risk }) {
-  let label = "LOW";
-  let className = "risk-low";
-
-  if (risk >= 60) {
-    label = "HIGH";
-    className = "risk-high";
-  } else if (risk >= 35) {
-    label = "MEDIUM";
-    className = "risk-medium";
-  }
-
-  return <span className={`risk-badge ${className}`}>{label}</span>;
-}
-
-export default function SmartOperations() {
-  const [activeTab, setActiveTab] = useState("overview");
-  const [simulation, setSimulation] = useState("availability");
-  const [simulationRun, setSimulationRun] = useState(false);
-
-  const recommendedTechnician = useMemo(() => {
-    return technicians
-      .map((tech) => ({
-        ...tech,
-        score:
-          tech.skill * 0.35 +
-          tech.availability * 0.25 +
-          tech.workload * 0.15 +
-          tech.distance * 0.1 +
-          tech.experience * 0.15,
-      }))
-      .sort((a, b) => b.score - a.score)[0];
-  }, []);
-
-  const simulationResults = {
-    availability: {
-      title: "Technician availability -20%",
-      requests: "+7",
-      sla: "+18%",
-      delay: "+42 min",
-      machines: "+3",
-      impact: "HIGH",
-    },
-    parts: {
-      title: "Spare part supply delayed",
-      requests: "+5",
-      sla: "+14%",
-      delay: "+35 min",
-      machines: "+2",
-      impact: "HIGH",
-    },
-    workload: {
-      title: "Workload increases by 25%",
-      requests: "+4",
-      sla: "+11%",
-      delay: "+28 min",
-      machines: "+2",
-      impact: "MEDIUM",
-    },
-  };
-
-  const currentSimulation = simulationResults[simulation];
 
   return (
-    <div className="smart-page">
-      <div className="smart-header">
+
+    <div className="hm-page">
+
+      <div className="hm-header">
+
         <div>
-          <div className="smart-eyebrow">HIVEMIND INTELLIGENCE</div>
-          <h1>Smart Operations Center</h1>
+
+          <span className="hm-kicker">
+            DECISION ENGINE / 08
+          </span>
+
+          <h1>
+            HiveMind
+          </h1>
+
           <p>
-            Predict problems, optimize resources and simulate operational
-            decisions before they happen.
+            The intelligence layer connecting machines,
+            technicians, resources and operational decisions.
           </p>
+
         </div>
 
-        <div className="intelligence-status">
-          <span className="pulse-dot"></span>
-          Intelligence Engine Active
-        </div>
+
+        <span className="hm-status hm-good">
+          INTELLIGENCE ACTIVE
+        </span>
+
       </div>
 
-      <div className="smart-tabs">
-        <button
-          className={activeTab === "overview" ? "active" : ""}
-          onClick={() => setActiveTab("overview")}
-        >
-          Overview
-        </button>
 
-        <button
-          className={activeTab === "technicians" ? "active" : ""}
-          onClick={() => setActiveTab("technicians")}
-        >
-          Technician Matching
-        </button>
+      <div className="hm-tabs">
 
-        <button
-          className={activeTab === "machines" ? "active" : ""}
-          onClick={() => setActiveTab("machines")}
-        >
-          Machine Health
-        </button>
+        {tabs.map((tab) => (
 
-        <button
-          className={activeTab === "parts" ? "active" : ""}
-          onClick={() => setActiveTab("parts")}
-        >
-          Parts Intelligence
-        </button>
+          <button
+            key={tab}
+            className={`hm-tab ${
+              activeTab === tab
+                ? "active"
+                : ""
+            }`}
+            onClick={() =>
+              setActiveTab(tab)
+            }
+          >
+            {tab}
+          </button>
 
-        <button
-          className={activeTab === "sla" ? "active" : ""}
-          onClick={() => setActiveTab("sla")}
-        >
-          SLA Prediction
-        </button>
+        ))}
 
-        <button
-          className={activeTab === "simulation" ? "active" : ""}
-          onClick={() => setActiveTab("simulation")}
-        >
-          Impact Simulation
-        </button>
       </div>
 
-      {activeTab === "overview" && (
+
+      {/* =====================================================
+          OVERVIEW
+          ===================================================== */}
+
+      {activeTab === "Overview" && (
+
         <>
-          <div className="intelligence-grid">
-            <div className="intelligence-card">
-              <div className="card-heading">
+
+          <div className="hm-grid hm-grid-4">
+
+            <div className="hm-metric">
+
+              <span className="hm-metric-label">
+                DECISIONS
+              </span>
+
+              <strong className="hm-metric-value">
+                124
+              </strong>
+
+              <span className="hm-metric-note">
+                Intelligence evaluations
+              </span>
+
+            </div>
+
+
+            <div className="hm-metric">
+
+              <span className="hm-metric-label">
+                MATCH SCORE
+              </span>
+
+              <strong className="hm-metric-value">
+                96%
+              </strong>
+
+              <span className="hm-metric-note">
+                Best technician match
+              </span>
+
+            </div>
+
+
+            <div className="hm-metric">
+
+              <span className="hm-metric-label">
+                MACHINE RISK
+              </span>
+
+              <strong className="hm-metric-value hm-risk">
+                54%
+              </strong>
+
+              <span className="hm-metric-note">
+                Highest detected risk
+              </span>
+
+            </div>
+
+
+            <div className="hm-metric">
+
+              <span className="hm-metric-label">
+                SLA RISK
+              </span>
+
+              <strong className="hm-metric-value hm-warning">
+                72%
+              </strong>
+
+              <span className="hm-metric-note">
+                Highest predicted delay
+              </span>
+
+            </div>
+
+          </div>
+
+
+          <div
+            className="hm-grid hm-grid-2"
+            style={{ marginTop: "14px" }}
+          >
+
+            <div className="hm-panel">
+
+              <div className="hm-panel-header">
+
                 <div>
-                  <span className="feature-icon">🧠</span>
-                  <h2>Technician Matching</h2>
+
+                  <span className="hm-panel-label">
+                    01 / WORKFORCE
+                  </span>
+
+                  <h2>
+                    Technician Matching
+                  </h2>
+
                 </div>
 
-                <span className="ai-label">SMART</span>
+                <span className="hm-status hm-good">
+                  SMART
+                </span>
+
               </div>
 
-              <p className="card-description">
-                Automatically rank technicians using skill, availability,
-                workload, distance and experience.
+
+              <p>
+                HiVeMind ranks technicians using
+                skill, availability, workload,
+                distance and experience.
               </p>
 
-              <div className="recommendation">
+
+              <div
+                style={{
+                  marginTop: "35px",
+                  display: "flex",
+                  justifyContent:
+                    "space-between",
+                  alignItems: "end"
+                }}
+              >
+
                 <div>
-                  <span className="small-label">BEST MATCH</span>
-                  <h3>{recommendedTechnician.name}</h3>
+
+                  <span className="hm-panel-label">
+                    BEST MATCH
+                  </span>
+
+                  <h2>
+                    Arjun Kumar
+                  </h2>
+
                 </div>
+
+
+                <strong className="hm-metric-value">
+                  96%
+                </strong>
+
+              </div>
+
+
+              <div className="hm-progress">
+
+                <span
+                  style={{
+                    width: "96%"
+                  }}
+                />
+
+              </div>
+
+            </div>
+
+
+            <div className="hm-panel">
+
+              <div className="hm-panel-header">
+
+                <div>
+
+                  <span className="hm-panel-label">
+                    02 / MACHINE
+                  </span>
+
+                  <h2>
+                    Machine Health
+                  </h2>
+
+                </div>
+
+                <span className="hm-status hm-risk">
+                  HIGH RISK
+                </span>
+
+              </div>
+
+
+              <p>
+                Machine health scoring identifies
+                equipment requiring preventative
+                maintenance.
+              </p>
+
+
+              <div
+                style={{
+                  marginTop: "35px",
+                  display: "flex",
+                  justifyContent:
+                    "space-between",
+                  alignItems: "end"
+                }}
+              >
+
+                <strong className="hm-metric-value hm-risk">
+                  54%
+                </strong>
+
+
+                <div>
+
+                  <span className="hm-panel-label">
+                    ASSET
+                  </span>
+
+                  <div className="hm-data-value">
+                    M-102 / CNC MACHINE
+                  </div>
+
+                </div>
+
+              </div>
+
+
+              <div className="hm-progress">
+
+                <span
+                  style={{
+                    width: "54%"
+                  }}
+                />
+
+              </div>
+
+            </div>
+
+
+            <div className="hm-panel">
+
+              <div className="hm-panel-header">
+
+                <div>
+
+                  <span className="hm-panel-label">
+                    03 / RESOURCE
+                  </span>
+
+                  <h2>
+                    Parts Intelligence
+                  </h2>
+
+                </div>
+
+                <span className="hm-status hm-warning">
+                  02 ALERTS
+                </span>
+
+              </div>
+
+
+              <p>
+                Predict stockouts before they
+                create service delays.
+              </p>
+
+
+              <strong className="hm-metric-value">
+                73%
+              </strong>
+
+              <span className="hm-panel-label">
+                STOCKOUT RISK
+              </span>
+
+
+              <div className="hm-progress">
+
+                <span
+                  style={{
+                    width: "73%"
+                  }}
+                />
+
+              </div>
+
+            </div>
+
+
+            <div className="hm-panel">
+
+              <div className="hm-panel-header">
+
+                <div>
+
+                  <span className="hm-panel-label">
+                    04 / SLA
+                  </span>
+
+                  <h2>
+                    SLA Prediction
+                  </h2>
+
+                </div>
+
+                <span className="hm-status hm-risk">
+                  AT RISK
+                </span>
+
+              </div>
+
+
+              <p>
+                Identify service requests likely
+                to exceed their SLA deadline.
+              </p>
+
+
+              <strong className="hm-metric-value hm-risk">
+                72%
+              </strong>
+
+              <span className="hm-panel-label">
+                SR-1024 / HYDRAULIC PRESS
+              </span>
+
+
+              <div className="hm-progress">
+
+                <span
+                  style={{
+                    width: "72%"
+                  }}
+                />
+
+              </div>
+
+            </div>
+
+          </div>
+
+        </>
+
+      )}
+
+
+      {/* =====================================================
+          TECHNICIAN MATCHING
+          ===================================================== */}
+
+      {activeTab === "Technician Matching" && (
+
+        <div className="hm-grid hm-grid-2">
+
+          <div className="hm-panel">
+
+            <span className="hm-panel-label">
+              REQUEST
+            </span>
+
+            <h2>
+              SR-1025
+            </h2>
+
+            <p>
+              Hydraulic pressure issue on M-104.
+            </p>
+
+
+            <div className="hm-data-row">
+
+              <span className="hm-data-label">
+                REQUIRED SKILL
+              </span>
+
+              <strong>
+                HYDRAULICS
+              </strong>
+
+            </div>
+
+
+            <div className="hm-data-row">
+
+              <span className="hm-data-label">
+                PRIORITY
+              </span>
+
+              <span className="hm-status hm-risk">
+                CRITICAL
+              </span>
+
+            </div>
+
+
+            <div className="hm-data-row">
+
+              <span className="hm-data-label">
+                SITE
+              </span>
+
+              <strong>
+                SITE A
+              </strong>
+
+            </div>
+
+          </div>
+
+
+          <div className="hm-panel">
+
+            <span className="hm-panel-label">
+              TOP RECOMMENDATION
+            </span>
+
+            <h2>
+              Arjun Kumar
+            </h2>
+
+            <strong className="hm-metric-value">
+              96%
+            </strong>
+
+            <p>
+              Overall suitability score.
+            </p>
+
+
+            <div className="hm-progress">
+
+              <span
+                style={{
+                  width: "96%"
+                }}
+              />
+
+            </div>
+
+
+            <div className="hm-data-row">
+
+              <span className="hm-data-label">
+                SKILL
+              </span>
+
+              <strong>
+                98%
+              </strong>
+
+            </div>
+
+
+            <div className="hm-data-row">
+
+              <span className="hm-data-label">
+                AVAILABILITY
+              </span>
+
+              <strong>
+                100%
+              </strong>
+
+            </div>
+
+
+            <div className="hm-data-row">
+
+              <span className="hm-data-label">
+                WORKLOAD
+              </span>
+
+              <strong>
+                82%
+              </strong>
+
+            </div>
+
+
+            <div className="hm-data-row">
+
+              <span className="hm-data-label">
+                EXPERIENCE
+              </span>
+
+              <strong>
+                95%
+              </strong>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      )}
+
+
+      {/* =====================================================
+          MACHINE HEALTH
+          ===================================================== */}
+
+      {activeTab === "Machine Health" && (
+
+        <div className="hm-grid hm-grid-3">
+
+          {[
+            {
+              id: "M-102",
+              name: "CNC MACHINE",
+              health: 54,
+              risk: "HIGH"
+            },
+            {
+              id: "M-104",
+              name: "HYDRAULIC PRESS",
+              health: 92,
+              risk: "LOW"
+            },
+            {
+              id: "M-103",
+              name: "AIR COMPRESSOR",
+              health: 81,
+              risk: "MEDIUM"
+            }
+          ].map((machine) => (
+
+            <div
+              className="hm-panel"
+              key={machine.id}
+            >
+
+              <span className="hm-panel-label">
+                ASSET
+              </span>
+
+              <h2>
+                {machine.id}
+              </h2>
+
+              <p>
+                {machine.name}
+              </p>
+
+
+              <strong
+                className={`hm-metric-value ${
+                  machine.health < 60
+                    ? "hm-risk"
+                    : machine.health < 80
+                      ? "hm-warning"
+                      : "hm-good"
+                }`}
+              >
+                {machine.health}%
+              </strong>
+
+
+              <span className="hm-panel-label">
+                MACHINE HEALTH
+              </span>
+
+
+              <div className="hm-progress">
+
+                <span
+                  style={{
+                    width:
+                      `${machine.health}%`
+                  }}
+                />
+
+              </div>
+
+
+              <div
+                style={{
+                  marginTop: "20px"
+                }}
+              >
+
+                <span
+                  className={`hm-status ${
+                    machine.health < 60
+                      ? "hm-risk"
+                      : machine.health < 80
+                        ? "hm-warning"
+                        : "hm-good"
+                  }`}
+                >
+                  {machine.risk} RISK
+                </span>
+
+              </div>
+
+            </div>
+
+          ))}
+
+        </div>
+
+      )}
+
+
+      {/* =====================================================
+          PARTS INTELLIGENCE
+          ===================================================== */}
+
+      {activeTab === "Parts Intelligence" && (
+
+        <div className="hm-grid hm-grid-2">
+
+          <div className="hm-panel">
+
+            <span className="hm-panel-label">
+              FORECAST ENGINE
+            </span>
+
+            <h2>
+              Hydraulic Seal Kit
+            </h2>
+
+            <p>
+              Current stock is below the predicted
+              demand threshold.
+            </p>
+
+
+            <strong className="hm-metric-value hm-warning">
+              73%
+            </strong>
+
+            <span className="hm-panel-label">
+              STOCKOUT PROBABILITY
+            </span>
+
+
+            <div className="hm-progress">
+
+              <span
+                style={{
+                  width: "73%"
+                }}
+              />
+
+            </div>
+
+
+            <button
+              className="hm-button"
+              style={{
+                marginTop: "25px"
+              }}
+            >
+              GENERATE REPLENISHMENT
+            </button>
+
+          </div>
+
+
+          <div className="hm-panel">
+
+            <span className="hm-panel-label">
+              PREDICTION LOGIC
+            </span>
+
+            <h2>
+              Demand Analysis
+            </h2>
+
+
+            <div className="hm-data-row">
+
+              <span className="hm-data-label">
+                CURRENT STOCK
+              </span>
+
+              <strong>
+                03
+              </strong>
+
+            </div>
+
+
+            <div className="hm-data-row">
+
+              <span className="hm-data-label">
+                MINIMUM STOCK
+              </span>
+
+              <strong>
+                05
+              </strong>
+
+            </div>
+
+
+            <div className="hm-data-row">
+
+              <span className="hm-data-label">
+                EXPECTED DEMAND
+              </span>
+
+              <strong>
+                08
+              </strong>
+
+            </div>
+
+
+            <div className="hm-data-row">
+
+              <span className="hm-data-label">
+                RISK
+              </span>
+
+              <span className="hm-status hm-warning">
+                HIGH
+              </span>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      )}
+
+
+      {/* =====================================================
+          SLA PREDICTION
+          ===================================================== */}
+
+      {activeTab === "SLA Prediction" && (
+
+        <div className="hm-grid hm-grid-2">
+
+          <div className="hm-panel">
+
+            <span className="hm-panel-label">
+              SLA ENGINE
+            </span>
+
+            <h2>
+              SR-1024
+            </h2>
+
+            <p>
+              Hydraulic Press M-104
+            </p>
+
+
+            <strong className="hm-metric-value hm-risk">
+              72%
+            </strong>
+
+            <span className="hm-panel-label">
+              DELAY PROBABILITY
+            </span>
+
+
+            <div className="hm-progress">
+
+              <span
+                style={{
+                  width: "72%"
+                }}
+              />
+
+            </div>
+
+          </div>
+
+
+          <div className="hm-panel">
+
+            <span className="hm-panel-label">
+              RISK FACTORS
+            </span>
+
+            <h2>
+              Why is this request at risk?
+            </h2>
+
+
+            <div className="hm-data-row">
+
+              <span className="hm-data-label">
+                TECHNICIAN AVAILABILITY
+              </span>
+
+              <strong className="hm-risk">
+                HIGH RISK
+              </strong>
+
+            </div>
+
+
+            <div className="hm-data-row">
+
+              <span className="hm-data-label">
+                PART AVAILABILITY
+              </span>
+
+              <strong className="hm-warning">
+                MEDIUM
+              </strong>
+
+            </div>
+
+
+            <div className="hm-data-row">
+
+              <span className="hm-data-label">
+                CURRENT WORKLOAD
+              </span>
+
+              <strong className="hm-risk">
+                HIGH
+              </strong>
+
+            </div>
+
+
+            <div className="hm-data-row">
+
+              <span className="hm-data-label">
+                RECOMMENDATION
+              </span>
+
+              <strong>
+                REASSIGN
+              </strong>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      )}
+
+
+      {/* =====================================================
+          IMPACT SIMULATION
+          ===================================================== */}
+
+      {activeTab === "Impact Simulation" && (
+
+        <>
+
+          <div className="hm-panel">
+
+            <span className="hm-kicker">
+              SCENARIO ENGINE
+            </span>
+
+            <h2>
+              Operational Impact Simulation
+            </h2>
+
+            <p>
+              Test operational changes before they
+              affect the real service workflow.
+            </p>
+
+
+            <div
+              className="hm-grid hm-grid-3"
+              style={{
+                marginTop: "30px"
+              }}
+            >
+
+              <div className="hm-metric">
+
+                <span className="hm-metric-label">
+                  TECHNICIAN AVAILABILITY
+                </span>
+
+                <strong className="hm-metric-value hm-risk">
+                  -20%
+                </strong>
+
+                <span className="hm-metric-note">
+                  Workforce reduction
+                </span>
+
+              </div>
+
+
+              <div className="hm-metric">
+
+                <span className="hm-metric-label">
+                  PART SUPPLY DELAY
+                </span>
+
+                <strong className="hm-metric-value hm-warning">
+                  +7D
+                </strong>
+
+                <span className="hm-metric-note">
+                  Additional delivery time
+                </span>
+
+              </div>
+
+
+              <div className="hm-metric">
+
+                <span className="hm-metric-label">
+                  WORKLOAD
+                </span>
+
+                <strong className="hm-metric-value hm-risk">
+                  +25%
+                </strong>
+
+                <span className="hm-metric-note">
+                  Operational increase
+                </span>
+
+              </div>
+
+            </div>
+
+          </div>
+
+
+          <div
+            className="hm-grid hm-grid-2"
+            style={{
+              marginTop: "14px"
+            }}
+          >
+
+            <div className="hm-panel">
+
+              <span className="hm-panel-label">
+                CURRENT SYSTEM
+              </span>
+
+              <h2>
+                Baseline
+              </h2>
+
+
+              <div className="hm-data-row">
+
+                <span className="hm-data-label">
+                  OPEN REQUESTS
+                </span>
 
                 <strong>
-                  {Math.round(recommendedTechnician.score)}%
+                  12
                 </strong>
+
               </div>
+
+
+              <div className="hm-data-row">
+
+                <span className="hm-data-label">
+                  AT RISK
+                </span>
+
+                <strong>
+                  04
+                </strong>
+
+              </div>
+
+
+              <div className="hm-data-row">
+
+                <span className="hm-data-label">
+                  AVAILABLE TECHNICIANS
+                </span>
+
+                <strong>
+                  06
+                </strong>
+
+              </div>
+
             </div>
 
-            <div className="intelligence-card">
-              <div className="card-heading">
-                <div>
-                  <span className="feature-icon">❤️‍🩹</span>
-                  <h2>Machine Health</h2>
-                </div>
 
-                <span className="warning-label">3 ALERTS</span>
+            <div className="hm-panel">
+
+              <span className="hm-panel-label">
+                SIMULATED SYSTEM
+              </span>
+
+              <h2>
+                Scenario
+              </h2>
+
+
+              <div className="hm-data-row">
+
+                <span className="hm-data-label">
+                  OPEN REQUESTS
+                </span>
+
+                <strong className="hm-risk">
+                  17
+                </strong>
+
               </div>
 
-              <p className="card-description">
-                Predict machine failure risk using equipment condition and
-                maintenance indicators.
-              </p>
 
-              <div className="health-preview">
-                <strong>54</strong>
-                <div>
-                  <span>Lowest machine health</span>
-                  <small>M-102 • CNC Machine</small>
-                </div>
+              <div className="hm-data-row">
 
-                <RiskBadge risk={67} />
+                <span className="hm-data-label">
+                  AT RISK
+                </span>
+
+                <strong className="hm-risk">
+                  09
+                </strong>
+
               </div>
+
+
+              <div className="hm-data-row">
+
+                <span className="hm-data-label">
+                  AVAILABLE TECHNICIANS
+                </span>
+
+                <strong className="hm-risk">
+                  05
+                </strong>
+
+              </div>
+
             </div>
 
-            <div className="intelligence-card">
-              <div className="card-heading">
-                <div>
-                  <span className="feature-icon">📦</span>
-                  <h2>Parts Intelligence</h2>
-                </div>
-
-                <span className="warning-label">2 ALERTS</span>
-              </div>
-
-              <p className="card-description">
-                Predict upcoming stockouts and recommend replenishment before
-                service is delayed.
-              </p>
-
-              <div className="health-preview">
-                <strong>73%</strong>
-                <div>
-                  <span>Highest stockout risk</span>
-                  <small>Hydraulic Seal Kit</small>
-                </div>
-
-                <RiskBadge risk={73} />
-              </div>
-            </div>
-
-            <div className="intelligence-card">
-              <div className="card-heading">
-                <div>
-                  <span className="feature-icon">⏱️</span>
-                  <h2>SLA Prediction</h2>
-                </div>
-
-                <span className="warning-label">1 HIGH RISK</span>
-              </div>
-
-              <p className="card-description">
-                Predict which service requests are likely to miss their SLA
-                before they become overdue.
-              </p>
-
-              <div className="health-preview">
-                <strong>72%</strong>
-                <div>
-                  <span>Highest SLA risk</span>
-                  <small>SR-1024 • Hydraulic Press</small>
-                </div>
-
-                <RiskBadge risk={72} />
-              </div>
-            </div>
           </div>
 
-          <div className="smart-section">
-            <div className="section-title">
-              <div>
-                <h2>Priority Intelligence</h2>
-                <p>
-                  Items that need attention based on current predictions.
-                </p>
-              </div>
-            </div>
 
-            <div className="priority-table">
-              {serviceRequests.map((request) => (
-                <div className="priority-row" key={request.id}>
-                  <div>
-                    <strong>{request.id}</strong>
-                    <span>{request.issue}</span>
-                  </div>
+          <div
+            className="hm-panel"
+            style={{
+              marginTop: "14px",
+              borderColor: "#f3fb04"
+            }}
+          >
 
-                  <div>
-                    <span className="table-label">SLA RISK</span>
-                    <RiskBadge risk={request.risk} />
-                  </div>
+            <span className="hm-panel-label">
+              SYSTEM IMPACT
+            </span>
 
-                  <div>
-                    <span className="table-label">EST. COMPLETION</span>
-                    <strong>{request.completion}</strong>
-                  </div>
+            <strong className="hm-metric-value hm-risk">
+              +41%
+            </strong>
 
-                  <div>
-                    <span className="table-label">BUFFER</span>
-                    <strong>{request.buffer}</strong>
-                  </div>
-                </div>
-              ))}
-            </div>
+            <p>
+              Projected operational risk increase
+              under the simulated conditions.
+            </p>
+
           </div>
+
         </>
+
       )}
 
-      {activeTab === "technicians" && (
-        <div className="smart-section">
-          <div className="section-title">
-            <div>
-              <h2>Intelligent Technician Matching</h2>
-              <p>
-                Recommended technician for service request SR-1024.
-              </p>
-            </div>
-
-            <span className="request-chip">SR-1024</span>
-          </div>
-
-          <div className="match-hero">
-            <div>
-              <span className="small-label">RECOMMENDED TECHNICIAN</span>
-              <h2>{recommendedTechnician.name}</h2>
-              <p>
-                Best overall match based on five operational parameters.
-              </p>
-            </div>
-
-            <div className="match-score">
-              <strong>
-                {Math.round(recommendedTechnician.score)}%
-              </strong>
-              <span>Match Score</span>
-            </div>
-          </div>
-
-          <div className="technician-list">
-            {technicians.map((tech) => {
-              const score =
-                tech.skill * 0.35 +
-                tech.availability * 0.25 +
-                tech.workload * 0.15 +
-                tech.distance * 0.1 +
-                tech.experience * 0.15;
-
-              return (
-                <div className="technician-card" key={tech.name}>
-                  <div className="technician-card-top">
-                    <div className="technician-avatar">
-                      {tech.name.charAt(0)}
-                    </div>
-
-                    <div>
-                      <h3>{tech.name}</h3>
-                      <span>Technician</span>
-                    </div>
-
-                    <strong className="technician-score">
-                      {Math.round(score)}%
-                    </strong>
-                  </div>
-
-                  <div className="metric-grid">
-                    <div>
-                      <div className="metric-label">
-                        Skill Match <strong>{tech.skill}%</strong>
-                      </div>
-                      <ScoreBar value={tech.skill} />
-                    </div>
-
-                    <div>
-                      <div className="metric-label">
-                        Availability <strong>{tech.availability}%</strong>
-                      </div>
-                      <ScoreBar value={tech.availability} />
-                    </div>
-
-                    <div>
-                      <div className="metric-label">
-                        Workload <strong>{tech.workload}%</strong>
-                      </div>
-                      <ScoreBar value={tech.workload} />
-                    </div>
-
-                    <div>
-                      <div className="metric-label">
-                        Distance <strong>{tech.distance}%</strong>
-                      </div>
-                      <ScoreBar value={tech.distance} />
-                    </div>
-
-                    <div>
-                      <div className="metric-label">
-                        Experience <strong>{tech.experience}%</strong>
-                      </div>
-                      <ScoreBar value={tech.experience} />
-                    </div>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      )}
-
-      {activeTab === "machines" && (
-        <div className="smart-section">
-          <div className="section-title">
-            <div>
-              <h2>Predictive Machine Health</h2>
-              <p>
-                Identify machines that may require maintenance before failure.
-              </p>
-            </div>
-          </div>
-
-          <div className="machine-grid">
-            {machines.map((machine) => (
-              <div className="machine-card" key={machine.id}>
-                <div className="machine-card-header">
-                  <div>
-                    <span className="small-label">{machine.id}</span>
-                    <h3>{machine.name}</h3>
-                  </div>
-
-                  <RiskBadge risk={machine.risk} />
-                </div>
-
-                <div className="health-score">
-                  <div>
-                    <span>HEALTH SCORE</span>
-                    <strong>{machine.health}</strong>
-                    <small>/100</small>
-                  </div>
-
-                  <div className="health-ring">
-                    <div
-                      className="health-ring-inner"
-                      style={{
-                        "--health": `${machine.health}%`,
-                      }}
-                    >
-                      {machine.health}
-                    </div>
-                  </div>
-                </div>
-
-                <div className="machine-status">
-                  <span>{machine.status}</span>
-                  <strong>{machine.risk}% failure risk</strong>
-                </div>
-
-                <div className="machine-metrics">
-                  <div>
-                    <span>Temperature</span>
-                    <strong>{machine.temperature}</strong>
-                  </div>
-
-                  <div>
-                    <span>Vibration</span>
-                    <strong>{machine.vibration}</strong>
-                  </div>
-
-                  <div>
-                    <span>Pressure</span>
-                    <strong>{machine.pressure}</strong>
-                  </div>
-
-                  <div>
-                    <span>Maintenance Age</span>
-                    <strong>{machine.maintenance}%</strong>
-                  </div>
-                </div>
-
-                {machine.risk >= 60 && (
-                  <button className="action-button">
-                    Create Service Request
-                  </button>
-                )}
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {activeTab === "parts" && (
-        <div className="smart-section">
-          <div className="section-title">
-            <div>
-              <h2>Spare Parts Intelligence</h2>
-              <p>
-                Predict stockouts and recommend replenishment before service
-                is affected.
-              </p>
-            </div>
-          </div>
-
-          <div className="parts-grid">
-            {parts.map((part) => (
-              <div className="part-intelligence-card" key={part.name}>
-                <div className="part-header">
-                  <div>
-                    <span className="small-label">PART</span>
-                    <h3>{part.name}</h3>
-                  </div>
-
-                  <RiskBadge risk={part.stockoutRisk} />
-                </div>
-
-                <div className="part-stats">
-                  <div>
-                    <span>Current Stock</span>
-                    <strong>{part.stock}</strong>
-                  </div>
-
-                  <div>
-                    <span>Minimum</span>
-                    <strong>{part.minimum}</strong>
-                  </div>
-
-                  <div>
-                    <span>Predicted Usage</span>
-                    <strong>{part.predictedUsage}</strong>
-                  </div>
-                </div>
-
-                <div className="stockout-section">
-                  <div className="metric-label">
-                    Stockout Probability
-                    <strong>{part.stockoutRisk}%</strong>
-                  </div>
-
-                  <ScoreBar value={part.stockoutRisk} />
-                </div>
-
-                <div className="recommendation-box">
-                  <span>RECOMMENDED ACTION</span>
-                  <strong>{part.recommendation}</strong>
-                </div>
-
-                {part.stockoutRisk >= 60 && (
-                  <button className="action-button">
-                    Generate Replenishment
-                  </button>
-                )}
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {activeTab === "sla" && (
-        <div className="smart-section">
-          <div className="section-title">
-            <div>
-              <h2>SLA & Delay Prediction</h2>
-              <p>
-                Identify requests that are likely to miss their SLA deadline.
-              </p>
-            </div>
-          </div>
-
-          <div className="sla-list">
-            {serviceRequests.map((request) => (
-              <div className="sla-card" key={request.id}>
-                <div className="sla-main">
-                  <div>
-                    <span className="small-label">{request.id}</span>
-                    <h3>{request.issue}</h3>
-                    <p>
-                      Machine: {request.machine} • Deadline:{" "}
-                      {request.deadline}
-                    </p>
-                  </div>
-
-                  <div className="sla-risk">
-                    <strong>{request.risk}%</strong>
-                    <span>Delay Risk</span>
-                    <RiskBadge risk={request.risk} />
-                  </div>
-                </div>
-
-                <div className="sla-progress">
-                  <div className="metric-label">
-                    <span>Predicted completion</span>
-                    <strong>{request.completion}</strong>
-                  </div>
-
-                  <ScoreBar value={100 - request.risk} />
-                </div>
-
-                <div className="sla-bottom">
-                  <div>
-                    <span>BUFFER</span>
-                    <strong>{request.buffer}</strong>
-                  </div>
-
-                  <div>
-                    <span>RISK FACTORS</span>
-                    <strong>{request.reasons.join(" • ")}</strong>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {activeTab === "simulation" && (
-        <div className="smart-section">
-          <div className="section-title">
-            <div>
-              <h2>Impact Simulation</h2>
-              <p>
-                Test operational scenarios before making real-world decisions.
-              </p>
-            </div>
-          </div>
-
-          <div className="simulation-controls">
-            <button
-              className={simulation === "availability" ? "selected" : ""}
-              onClick={() => {
-                setSimulation("availability");
-                setSimulationRun(false);
-              }}
-            >
-              Technician Availability
-            </button>
-
-            <button
-              className={simulation === "parts" ? "selected" : ""}
-              onClick={() => {
-                setSimulation("parts");
-                setSimulationRun(false);
-              }}
-            >
-              Parts Supply
-            </button>
-
-            <button
-              className={simulation === "workload" ? "selected" : ""}
-              onClick={() => {
-                setSimulation("workload");
-                setSimulationRun(false);
-              }}
-            >
-              Workload Increase
-            </button>
-          </div>
-
-          <div className="simulation-card">
-            <div className="simulation-input">
-              <span className="small-label">SCENARIO</span>
-              <h2>{currentSimulation.title}</h2>
-              <p>
-                HiveMind will estimate the operational impact across service
-                requests, SLA compliance and machine availability.
-              </p>
-
-              <button
-                className="simulate-button"
-                onClick={() => setSimulationRun(true)}
-              >
-                {simulationRun ? "Simulation Complete" : "Run Simulation"}
-              </button>
-            </div>
-
-            {simulationRun && (
-              <div className="simulation-results">
-                <div className="simulation-impact">
-                  <span>OVERALL IMPACT</span>
-                  <strong>{currentSimulation.impact}</strong>
-                </div>
-
-                <div className="simulation-stat">
-                  <span>Affected Requests</span>
-                  <strong>{currentSimulation.requests}</strong>
-                </div>
-
-                <div className="simulation-stat">
-                  <span>SLA Risk</span>
-                  <strong>{currentSimulation.sla}</strong>
-                </div>
-
-                <div className="simulation-stat">
-                  <span>Average Delay</span>
-                  <strong>{currentSimulation.delay}</strong>
-                </div>
-
-                <div className="simulation-stat">
-                  <span>Machines at Risk</span>
-                  <strong>{currentSimulation.machines}</strong>
-                </div>
-              </div>
-            )}
-          </div>
-
-          {simulationRun && (
-            <div className="recommendation-panel">
-              <div>
-                <span className="small-label">HIVEMIND RECOMMENDATION</span>
-                <h3>Rebalance technician assignments</h3>
-                <p>
-                  Move one available technician toward high-risk requests to
-                  reduce predicted SLA breaches.
-                </p>
-              </div>
-
-              <button className="action-button">
-                Apply Recommendation
-              </button>
-            </div>
-          )}
-        </div>
-      )}
     </div>
+
   );
 }
+
+
+export default SmartOperations;

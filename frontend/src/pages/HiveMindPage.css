@@ -1,0 +1,477 @@
+/* =========================================================
+   HIVEMIND PAGE SYSTEM
+   ========================================================= */
+
+.hm-page {
+  min-height: calc(100vh - 64px);
+
+  position: relative;
+
+  padding: 48px;
+
+  background:
+    linear-gradient(
+      rgba(255,255,255,0.025) 1px,
+      transparent 1px
+    ),
+    linear-gradient(
+      90deg,
+      rgba(255,255,255,0.025) 1px,
+      transparent 1px
+    );
+
+  background-size: 52px 52px;
+
+  overflow: hidden;
+}
+
+
+/* HEADER */
+
+.hm-header {
+  display: flex;
+
+  align-items: flex-end;
+  justify-content: space-between;
+
+  gap: 30px;
+
+  margin-bottom: 42px;
+}
+
+.hm-kicker {
+  display: block;
+
+  margin-bottom: 13px;
+
+  color: #f3fb04;
+
+  font-size: 9px;
+
+  font-weight: 900;
+
+  letter-spacing: 0.3em;
+
+  text-transform: uppercase;
+}
+
+.hm-header h1 {
+  margin: 0;
+
+  color: #f4f4ed;
+
+  font-size: clamp(52px, 6vw, 92px);
+
+  line-height: 0.86;
+
+  font-weight: 900;
+
+  letter-spacing: -0.065em;
+
+  text-transform: uppercase;
+}
+
+.hm-header p {
+  max-width: 620px;
+
+  margin: 18px 0 0;
+
+  color: #777;
+
+  font-size: 14px;
+
+  line-height: 1.6;
+}
+
+
+/* GRID */
+
+.hm-grid {
+  display: grid;
+
+  gap: 12px;
+}
+
+.hm-grid-2 {
+  grid-template-columns:
+    repeat(2, minmax(0, 1fr));
+}
+
+.hm-grid-3 {
+  grid-template-columns:
+    repeat(3, minmax(0, 1fr));
+}
+
+.hm-grid-4 {
+  grid-template-columns:
+    repeat(4, minmax(0, 1fr));
+}
+
+
+/* PANEL */
+
+.hm-panel {
+  position: relative;
+
+  background: #0d0d0d;
+
+  border: 1px solid #242424;
+
+  padding: 26px;
+}
+
+.hm-panel::before {
+  content: "";
+
+  position: absolute;
+
+  top: 0;
+  left: 0;
+
+  width: 38px;
+  height: 2px;
+
+  background: #f3fb04;
+}
+
+
+/* PANEL HEADER */
+
+.hm-panel-header {
+  display: flex;
+
+  align-items: flex-start;
+  justify-content: space-between;
+
+  gap: 20px;
+
+  margin-bottom: 24px;
+}
+
+.hm-panel-label {
+  color: #777;
+
+  font-size: 9px;
+
+  font-weight: 800;
+
+  letter-spacing: 0.2em;
+
+  text-transform: uppercase;
+}
+
+.hm-panel h2 {
+  margin: 7px 0 0;
+
+  color: #f4f4ed;
+
+  font-size: 21px;
+
+  letter-spacing: -0.03em;
+}
+
+
+/* METRIC */
+
+.hm-metric {
+  min-height: 150px;
+
+  display: flex;
+
+  flex-direction: column;
+
+  justify-content: space-between;
+
+  padding: 22px;
+
+  background: #0d0d0d;
+
+  border: 1px solid #242424;
+}
+
+.hm-metric-label {
+  color: #777;
+
+  font-size: 9px;
+
+  font-weight: 800;
+
+  letter-spacing: 0.18em;
+
+  text-transform: uppercase;
+}
+
+.hm-metric-value {
+  color: #f3fb04;
+
+  font-size: 52px;
+
+  font-weight: 900;
+
+  line-height: 1;
+
+  letter-spacing: -0.06em;
+}
+
+.hm-metric-note {
+  color: #555;
+
+  font-size: 10px;
+}
+
+
+/* BUTTON */
+
+.hm-button {
+  border: 1px solid #f3fb04;
+
+  background: #f3fb04;
+
+  color: #050505;
+
+  padding: 12px 18px;
+
+  font-size: 9px;
+
+  font-weight: 900;
+
+  letter-spacing: 0.14em;
+
+  text-transform: uppercase;
+}
+
+.hm-button:hover {
+  background: transparent;
+
+  color: #f3fb04;
+}
+
+.hm-button-dark {
+  border: 1px solid #303030;
+
+  background: transparent;
+
+  color: #f4f4ed;
+
+  padding: 12px 18px;
+
+  font-size: 9px;
+
+  font-weight: 800;
+
+  letter-spacing: 0.14em;
+
+  text-transform: uppercase;
+}
+
+.hm-button-dark:hover {
+  border-color: #f3fb04;
+
+  color: #f3fb04;
+}
+
+
+/* DATA ROW */
+
+.hm-data-row {
+  display: grid;
+
+  grid-template-columns:
+    1.4fr 1fr 1fr 1fr;
+
+  gap: 20px;
+
+  align-items: center;
+
+  min-height: 62px;
+
+  border-bottom: 1px solid #242424;
+}
+
+.hm-data-row:last-child {
+  border-bottom: 0;
+}
+
+.hm-data-label {
+  color: #777;
+
+  font-size: 9px;
+
+  letter-spacing: 0.15em;
+
+  text-transform: uppercase;
+}
+
+.hm-data-value {
+  color: #f4f4ed;
+
+  font-size: 12px;
+
+  font-weight: 700;
+}
+
+
+/* STATUS */
+
+.hm-status {
+  display: inline-flex;
+
+  align-items: center;
+
+  gap: 7px;
+
+  width: fit-content;
+
+  padding: 6px 9px;
+
+  border: 1px solid currentColor;
+
+  color: #a8ff4a;
+
+  font-size: 8px;
+
+  font-weight: 900;
+
+  letter-spacing: 0.12em;
+
+  text-transform: uppercase;
+}
+
+.hm-status::before {
+  content: "";
+
+  width: 5px;
+  height: 5px;
+
+  background: currentColor;
+
+  border-radius: 50%;
+}
+
+
+/* PROGRESS */
+
+.hm-progress {
+  width: 100%;
+
+  height: 3px;
+
+  margin-top: 14px;
+
+  background: #222;
+}
+
+.hm-progress span {
+  display: block;
+
+  height: 100%;
+
+  background: #f3fb04;
+}
+
+
+/* RISK */
+
+.hm-risk {
+  color: #ff4d4d;
+}
+
+.hm-warning {
+  color: #f3fb04;
+}
+
+.hm-good {
+  color: #a8ff4a;
+}
+
+
+/* TAB BAR */
+
+.hm-tabs {
+  display: flex;
+
+  gap: 0;
+
+  margin-bottom: 22px;
+
+  border-bottom: 1px solid #242424;
+
+  overflow-x: auto;
+}
+
+.hm-tab {
+  border: 0;
+
+  border-bottom: 2px solid transparent;
+
+  background: transparent;
+
+  color: #666;
+
+  padding: 14px 20px;
+
+  font-size: 9px;
+
+  font-weight: 900;
+
+  letter-spacing: 0.13em;
+
+  text-transform: uppercase;
+
+  white-space: nowrap;
+}
+
+.hm-tab:hover {
+  color: #f4f4ed;
+}
+
+.hm-tab.active {
+  border-bottom-color: #f3fb04;
+
+  color: #f3fb04;
+}
+
+
+/* RESPONSIVE */
+
+@media (max-width: 900px) {
+
+  .hm-page {
+    padding: 30px 22px;
+  }
+
+  .hm-header {
+    align-items: flex-start;
+
+    flex-direction: column;
+  }
+
+  .hm-grid-4 {
+    grid-template-columns:
+      repeat(2, 1fr);
+  }
+
+  .hm-grid-2 {
+    grid-template-columns: 1fr;
+  }
+
+}
+
+@media (max-width: 600px) {
+
+  .hm-grid-4,
+  .hm-grid-3 {
+    grid-template-columns: 1fr;
+  }
+
+  .hm-page {
+    padding: 22px 15px;
+  }
+
+  .hm-data-row {
+    grid-template-columns: 1fr 1fr;
+
+    padding: 14px 0;
+  }
+
+}

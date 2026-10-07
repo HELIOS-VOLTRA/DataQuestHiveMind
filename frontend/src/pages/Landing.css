@@ -1,11 +1,87 @@
+/* =========================================================
+   HIVEMIND — FUTURISTIC INDUSTRIAL LANDING
+   ========================================================= */
+
 .landing {
+  --black: #050505;
+  --black-soft: #0b0b0b;
+  --panel: #111111;
+  --panel-light: #171717;
+  --yellow: #f3fb04;
+  --yellow-soft: rgba(243, 251, 4, 0.12);
+  --white: #f4f4ed;
+  --muted: #777;
+  --line: #242424;
+  --line-light: #303030;
+
   min-height: 100vh;
-  background: #0a0a0a;
-  color: #f4f4ed;
+  background: var(--black);
+  color: var(--white);
+
   display: flex;
   flex-direction: column;
+
   overflow: hidden;
-  font-family: Arial, Helvetica, sans-serif;
+
+  font-family:
+    Inter,
+    Arial,
+    Helvetica,
+    sans-serif;
+
+  position: relative;
+}
+
+
+/* =========================================================
+   GLOBAL ATMOSPHERE
+   ========================================================= */
+
+.landing::before {
+  content: "";
+
+  position: fixed;
+  inset: 0;
+
+  pointer-events: none;
+
+  background:
+    linear-gradient(
+      90deg,
+      transparent 49.9%,
+      rgba(255, 255, 255, 0.025) 50%,
+      transparent 50.1%
+    ),
+    linear-gradient(
+      0deg,
+      transparent 49.9%,
+      rgba(255, 255, 255, 0.025) 50%,
+      transparent 50.1%
+    );
+
+  background-size: 80px 80px;
+
+  opacity: 0.25;
+
+  z-index: 0;
+}
+
+.landing::after {
+  content: "";
+
+  position: fixed;
+  inset: 0;
+
+  pointer-events: none;
+
+  background:
+    radial-gradient(
+      circle at 78% 35%,
+      rgba(243, 251, 4, 0.055),
+      transparent 28%
+    );
+
+  z-index: 0;
 }
 
 
@@ -14,12 +90,22 @@
    ========================================================= */
 
 .landing-nav {
-  height: 90px;
+  height: 82px;
+
   display: flex;
   align-items: center;
   justify-content: space-between;
+
   padding: 0 5vw;
-  border-bottom: 1px solid #252525;
+
+  border-bottom: 1px solid var(--line);
+
+  position: relative;
+  z-index: 10;
+
+  background: rgba(5, 5, 5, 0.86);
+
+  backdrop-filter: blur(12px);
 }
 
 .landing-brand {
@@ -29,56 +115,110 @@
 }
 
 .landing-logo {
-  width: 44px;
-  height: 44px;
-  background: #f3fb04;
-  color: #0a0a0a;
+  width: 42px;
+  height: 42px;
+
+  background: var(--yellow);
+  color: var(--black);
 
   display: flex;
   align-items: center;
   justify-content: center;
 
-  font-size: 15px;
-  font-weight: 900;
+  font-size: 13px;
+  font-weight: 950;
+
+  letter-spacing: -1px;
+
+  position: relative;
+
+  box-shadow:
+    6px 6px 0 rgba(243, 251, 4, 0.18);
+
+  transition:
+    transform 0.3s ease,
+    box-shadow 0.3s ease;
+}
+
+.landing-logo::after {
+  content: "";
+
+  position: absolute;
+
+  width: 7px;
+  height: 7px;
+
+  right: -4px;
+  top: -4px;
+
+  background: var(--yellow);
+
+  border-radius: 50%;
+
+  box-shadow:
+    0 0 15px var(--yellow);
+}
+
+.landing-logo:hover {
+  transform: translate(-2px, -2px);
+
+  box-shadow:
+    9px 9px 0 rgba(243, 251, 4, 0.18);
 }
 
 .landing-brand-text {
   display: flex;
   flex-direction: column;
+
   line-height: 1;
 }
 
 .landing-brand-text strong {
   font-size: 14px;
+
   letter-spacing: 2px;
+
+  font-weight: 900;
 }
 
 .landing-brand-text span {
-  margin-top: 5px;
-  font-size: 10px;
-  color: #888;
+  margin-top: 6px;
+
+  font-size: 9px;
+
+  color: #666;
+
   letter-spacing: 3px;
 }
 
 .landing-status {
-  font-size: 11px;
-  letter-spacing: 2px;
-  color: #999;
+  font-size: 9px;
+
+  letter-spacing: 2.5px;
+
+  color: #777;
 
   display: flex;
   align-items: center;
+
   gap: 9px;
+
+  text-transform: uppercase;
 }
 
 .status-dot {
-  width: 8px;
-  height: 8px;
+  width: 7px;
+  height: 7px;
 
-  background: #f3fb04;
+  background: var(--yellow);
 
   border-radius: 50%;
 
-  box-shadow: 0 0 15px #f3fb04;
+  box-shadow:
+    0 0 8px var(--yellow),
+    0 0 20px rgba(243, 251, 4, 0.45);
+
+  animation: statusPulse 2s ease-in-out infinite;
 }
 
 
@@ -90,9 +230,16 @@
   flex: 1;
 
   display: grid;
-  grid-template-columns: 1fr 1fr;
+
+  grid-template-columns:
+    minmax(0, 1.08fr)
+    minmax(0, 0.92fr);
 
   min-height: 650px;
+
+  position: relative;
+
+  z-index: 2;
 }
 
 
@@ -101,100 +248,228 @@
    ========================================================= */
 
 .landing-copy {
-  padding: 8vh 5vw;
+  padding:
+    7vh
+    5vw
+    8vh;
 
   display: flex;
   flex-direction: column;
   justify-content: center;
 
   position: relative;
-  z-index: 2;
+
+  z-index: 4;
 }
 
 .landing-kicker {
-  font-size: 11px;
-  letter-spacing: 3px;
-  color: #888;
+  font-size: 9px;
 
-  margin-bottom: 30px;
+  letter-spacing: 4px;
+
+  color: #777;
+
+  margin-bottom: 34px;
+
+  text-transform: uppercase;
+
+  display: flex;
+  align-items: center;
+
+  gap: 12px;
+}
+
+.landing-kicker::before {
+  content: "";
+
+  width: 30px;
+  height: 1px;
+
+  background: var(--yellow);
 }
 
 .landing-copy h1 {
   margin: 0;
 
-  font-size: clamp(70px, 9vw, 150px);
+  font-size:
+    clamp(
+      72px,
+      10vw,
+      158px
+    );
 
-  line-height: 0.82;
+  line-height: 0.78;
 
-  letter-spacing: -8px;
+  letter-spacing: -9px;
 
-  font-weight: 900;
+  font-weight: 950;
+
+  text-transform: uppercase;
+
+  position: relative;
+
+  z-index: 3;
 }
 
 .landing-copy h1 span {
-  color: #f3fb04;
+  color: var(--yellow);
+
+  display: block;
+
+  position: relative;
+}
+
+.landing-copy h1 span::after {
+  content: "";
+
+  position: absolute;
+
+  left: 0;
+  bottom: -8px;
+
+  width: 110px;
+  height: 3px;
+
+  background: var(--yellow);
+
+  box-shadow:
+    0 0 20px rgba(243, 251, 4, 0.5);
 }
 
 .landing-description {
-  max-width: 420px;
+  max-width: 460px;
 
-  margin-top: 45px;
+  margin-top: 52px;
 
   color: #999;
 
-  font-size: 17px;
+  font-size: 15px;
 
-  line-height: 1.6;
+  line-height: 1.75;
+
+  letter-spacing: 0.2px;
+
+  position: relative;
+
+  padding-left: 18px;
+}
+
+.landing-description::before {
+  content: "";
+
+  position: absolute;
+
+  left: 0;
+  top: 5px;
+
+  width: 2px;
+  height: calc(100% - 10px);
+
+  background: var(--yellow);
 }
 
 
 /* =========================================================
-   BUTTON
+   ENTER BUTTON
    ========================================================= */
 
 .landing-enter {
-  margin-top: 35px;
+  margin-top: 34px;
 
   width: fit-content;
 
-  border: none;
+  border: 1px solid var(--yellow);
 
-  background: #f3fb04;
-  color: #0a0a0a;
+  background: var(--yellow);
 
-  padding: 18px 25px;
+  color: var(--black);
 
-  font-size: 12px;
+  padding: 18px 22px;
 
-  font-weight: 800;
+  font-size: 10px;
 
-  letter-spacing: 1.5px;
+  font-weight: 950;
+
+  letter-spacing: 2px;
 
   display: flex;
 
-  gap: 40px;
+  gap: 55px;
 
   align-items: center;
 
   cursor: pointer;
 
+  position: relative;
+
+  overflow: hidden;
+
   transition:
-    transform 0.25s ease,
-    background 0.25s ease,
-    box-shadow 0.25s ease;
+    transform 0.3s ease,
+    background 0.3s ease,
+    color 0.3s ease,
+    box-shadow 0.3s ease;
+}
+
+.landing-enter::before {
+  content: "";
+
+  position: absolute;
+
+  top: 0;
+  left: -100%;
+
+  width: 100%;
+  height: 100%;
+
+  background: var(--black);
+
+  transition: left 0.35s ease;
+
+  z-index: 0;
+}
+
+.landing-enter span,
+.landing-enter {
+  isolation: isolate;
+}
+
+.landing-enter:hover::before {
+  left: 0;
 }
 
 .landing-enter:hover {
-  transform: translateX(8px);
+  color: var(--yellow);
 
-  background: #ffff66;
+  transform: translateX(7px);
 
-  box-shadow: 0 0 25px rgba(243, 251, 4, 0.25);
+  box-shadow:
+    8px 8px 0 rgba(243, 251, 4, 0.15);
+}
+
+.landing-enter::after {
+  content: "↗";
+
+  position: relative;
+
+  z-index: 2;
+
+  font-size: 18px;
+
+  line-height: 1;
+
+  transition:
+    transform 0.3s ease;
+}
+
+.landing-enter:hover::after {
+  transform:
+    translate(4px, -4px);
 }
 
 
 /* =========================================================
-   RIGHT SIDE
+   RIGHT VISUAL
    ========================================================= */
 
 .landing-visual {
@@ -202,65 +477,202 @@
 
   overflow: hidden;
 
-  border-left: 1px solid #252525;
+  border-left: 1px solid var(--line);
 
-  background: #111;
+  background:
+    radial-gradient(
+      circle at 50% 45%,
+      rgba(243, 251, 4, 0.04),
+      transparent 35%
+    ),
+    var(--black-soft);
 }
+
+
+/* =========================================================
+   TECHNICAL GRID
+   ========================================================= */
 
 .visual-grid {
   position: absolute;
 
-  inset: 0;
+  inset: -100px;
 
   background-image:
-    linear-gradient(#242424 1px, transparent 1px),
-    linear-gradient(90deg, #242424 1px, transparent 1px);
+    linear-gradient(
+      rgba(255, 255, 255, 0.055) 1px,
+      transparent 1px
+    ),
+    linear-gradient(
+      90deg,
+      rgba(255, 255, 255, 0.055) 1px,
+      transparent 1px
+    );
 
-  background-size: 60px 60px;
+  background-size:
+    55px 55px;
 
-  opacity: 0.45;
+  opacity: 0.6;
+
+  transform:
+    perspective(500px)
+    rotateX(55deg)
+    scale(1.5);
+
+  transform-origin: center bottom;
+
+  animation:
+    gridMove 18s linear infinite;
 }
+
+
+/* =========================================================
+   CIRCULAR SYSTEM
+   ========================================================= */
 
 .visual-circle {
   position: absolute;
 
-  width: 450px;
-  height: 450px;
+  width: 500px;
+  height: 500px;
 
-  border: 1px solid #f3fb04;
+  border:
+    1px solid
+    rgba(243, 251, 4, 0.7);
 
   border-radius: 50%;
 
-  right: -100px;
-  top: 100px;
+  right: -110px;
+  top: 50%;
 
-  opacity: 0.8;
+  transform:
+    translateY(-50%);
 
-  animation: rotateCircle 20s linear infinite;
+  opacity: 0.65;
+
+  box-shadow:
+    0 0 60px
+    rgba(243, 251, 4, 0.035);
+
+  animation:
+    rotateCircle 24s linear infinite;
 }
+
+.visual-circle::before {
+  content: "";
+
+  position: absolute;
+
+  inset: 45px;
+
+  border:
+    1px dashed
+    rgba(243, 251, 4, 0.25);
+
+  border-radius: 50%;
+}
+
+.visual-circle::after {
+  content: "";
+
+  position: absolute;
+
+  width: 10px;
+  height: 10px;
+
+  background: var(--yellow);
+
+  border-radius: 50%;
+
+  top: 28px;
+  left: 50%;
+
+  box-shadow:
+    0 0 20px var(--yellow);
+}
+
+
+/* =========================================================
+   DIAGONAL ENERGY LINES
+   ========================================================= */
 
 .visual-line {
   position: absolute;
 
-  height: 2px;
+  height: 1px;
 
-  background: #f3fb04;
+  background:
+    linear-gradient(
+      90deg,
+      transparent,
+      var(--yellow),
+      transparent
+    );
 
-  width: 65%;
+  width: 80%;
 
-  transform: rotate(-35deg);
+  transform:
+    rotate(-35deg);
 
-  right: -40px;
+  right: -80px;
+
+  box-shadow:
+    0 0 8px
+    rgba(243, 251, 4, 0.3);
 }
 
 .line-one {
-  top: 35%;
+  top: 37%;
+
+  opacity: 0.95;
 }
 
 .line-two {
-  top: 55%;
+  top: 57%;
 
-  opacity: 0.35;
+  opacity: 0.25;
+}
+
+
+/* =========================================================
+   EXTRA TECHNICAL MARKERS
+   ========================================================= */
+
+.landing-visual::before {
+  content: "SYSTEM / 01";
+
+  position: absolute;
+
+  top: 28px;
+  left: 30px;
+
+  color: #555;
+
+  font-size: 8px;
+
+  letter-spacing: 3px;
+
+  z-index: 3;
+}
+
+.landing-visual::after {
+  content: "";
+
+  position: absolute;
+
+  right: 25px;
+  top: 25px;
+
+  width: 9px;
+  height: 9px;
+
+  border:
+    1px solid
+    var(--yellow);
+
+  box-shadow:
+    0 0 15px
+    rgba(243, 251, 4, 0.4);
 }
 
 
@@ -271,81 +683,173 @@
 .machine-card {
   position: absolute;
 
-  left: 12%;
-  bottom: 18%;
+  left: 11%;
+  bottom: 17%;
 
-  width: 260px;
+  width: 280px;
 
-  padding: 25px;
+  padding: 27px;
 
-  background: #181818;
+  background:
+    linear-gradient(
+      135deg,
+      #191919,
+      #101010
+    );
 
-  border: 1px solid #333;
+  border:
+    1px solid
+    #343434;
 
-  box-shadow: 20px 20px 0 #f3fb04;
+  box-shadow:
+    18px 18px 0
+    var(--yellow);
 
-  animation: floatCard 4s ease-in-out infinite;
+  z-index: 5;
+
+  animation:
+    floatCard 5s ease-in-out infinite;
+
+  transition:
+    transform 0.4s ease,
+    box-shadow 0.4s ease;
+}
+
+.machine-card:hover {
+  transform:
+    translateY(-8px)
+    rotate(-1deg);
+
+  box-shadow:
+    24px 24px 0
+    var(--yellow);
+}
+
+.machine-card::before {
+  content: "";
+
+  position: absolute;
+
+  top: 0;
+  left: 0;
+
+  width: 100%;
+  height: 2px;
+
+  background:
+    linear-gradient(
+      90deg,
+      var(--yellow),
+      transparent
+    );
+}
+
+.machine-card::after {
+  content: "";
+
+  position: absolute;
+
+  right: 18px;
+  bottom: 18px;
+
+  width: 40px;
+  height: 40px;
+
+  border:
+    1px solid
+    rgba(243, 251, 4, 0.3);
+
+  border-radius: 50%;
 }
 
 .machine-card-top {
-  font-size: 10px;
+  font-size: 8px;
 
-  color: #777;
+  color: #666;
 
-  letter-spacing: 2px;
+  letter-spacing: 3px;
 
-  margin-bottom: 25px;
+  margin-bottom: 23px;
+
+  text-transform: uppercase;
 }
 
 .machine-status {
-  color: #f3fb04;
+  color: var(--yellow);
 
-  font-size: 20px;
+  font-size: 23px;
 
-  font-weight: 800;
+  font-weight: 950;
 
   margin-bottom: 10px;
+
+  letter-spacing: -1px;
 }
 
 .machine-location {
-  color: #aaa;
+  color: #888;
 
-  font-size: 10px;
+  font-size: 9px;
 
-  letter-spacing: 1px;
+  letter-spacing: 2px;
+
+  text-transform: uppercase;
 }
 
 
 /* =========================================================
-   NUMBER
+   BIG OUTLINED NUMBER
    ========================================================= */
 
 .big-number {
   position: absolute;
 
-  right: 10%;
-  bottom: 8%;
+  right: 6%;
+  bottom: 5%;
 
-  font-size: 160px;
+  font-size:
+    clamp(
+      130px,
+      17vw,
+      240px
+    );
 
-  font-weight: 900;
+  font-weight: 950;
 
   color: transparent;
 
-  -webkit-text-stroke: 1px #444;
+  -webkit-text-stroke:
+    1px #292929;
 
-  line-height: 1;
+  line-height: 0.8;
+
+  letter-spacing: -12px;
+
+  user-select: none;
+
+  z-index: 2;
 }
 
 
 /* =========================================================
-   FOOTER
+   SMALL DATA LABELS
+   ========================================================= */
+
+.landing-visual .machine-card::marker {
+  display: none;
+}
+
+
+/* =========================================================
+   FOOTER / METRICS
    ========================================================= */
 
 .landing-footer {
-  min-height: 90px;
+  min-height: 92px;
 
-  border-top: 1px solid #252525;
+  border-top:
+    1px solid
+    var(--line);
 
   display: grid;
 
@@ -354,6 +858,15 @@
     1.5fr;
 
   padding: 0 5vw;
+
+  position: relative;
+
+  z-index: 5;
+
+  background:
+    rgba(5, 5, 5, 0.9);
+
+  backdrop-filter: blur(8px);
 }
 
 .landing-footer div {
@@ -363,35 +876,66 @@
 
   justify-content: center;
 
-  border-right: 1px solid #252525;
+  border-right:
+    1px solid
+    var(--line);
 
-  padding-left: 20px;
+  padding-left: 22px;
+
+  position: relative;
+}
+
+.landing-footer div:first-child {
+  padding-left: 0;
 }
 
 .landing-footer strong {
-  font-size: 22px;
+  font-size: 21px;
 
-  color: #f3fb04;
+  color: var(--yellow);
+
+  font-weight: 900;
+
+  letter-spacing: -1px;
 }
 
 .landing-footer span {
   margin-top: 5px;
 
-  color: #777;
+  color: #666;
 
-  font-size: 9px;
+  font-size: 8px;
 
-  letter-spacing: 2px;
+  letter-spacing: 2.5px;
+
+  text-transform: uppercase;
 }
 
 .scroll-text {
   align-items: flex-end;
 
-  color: #777;
+  color: #666;
 
-  font-size: 10px;
+  font-size: 8px;
 
   letter-spacing: 2px;
+
+  text-transform: uppercase;
+
+  padding-right: 0;
+}
+
+.scroll-text::after {
+  content: "↓";
+
+  color: var(--yellow);
+
+  font-size: 18px;
+
+  margin-top: 5px;
+
+  animation:
+    scrollBounce 1.6s ease-in-out infinite;
 }
 
 
@@ -401,25 +945,102 @@
 
 @keyframes rotateCircle {
   from {
-    transform: rotate(0deg);
+    transform:
+      translateY(-50%)
+      rotate(0deg);
   }
 
   to {
-    transform: rotate(360deg);
+    transform:
+      translateY(-50%)
+      rotate(360deg);
   }
 }
 
 @keyframes floatCard {
   0% {
+    transform:
+      translateY(0)
+      rotate(0deg);
+  }
+
+  50% {
+    transform:
+      translateY(-10px)
+      rotate(-0.5deg);
+  }
+
+  100% {
+    transform:
+      translateY(0)
+      rotate(0deg);
+  }
+}
+
+@keyframes gridMove {
+  from {
+    background-position:
+      0 0,
+      0 0;
+  }
+
+  to {
+    background-position:
+      55px 55px,
+      55px 55px;
+  }
+}
+
+@keyframes statusPulse {
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  50% {
+    opacity: 0.45;
+    transform: scale(0.7);
+  }
+}
+
+@keyframes scrollBounce {
+  0%,
+  100% {
     transform: translateY(0);
   }
 
   50% {
-    transform: translateY(-10px);
+    transform: translateY(5px);
+  }
+}
+
+
+/* =========================================================
+   TABLET
+   ========================================================= */
+
+@media (max-width: 1000px) {
+  .landing-main {
+    grid-template-columns:
+      1fr
+      0.8fr;
   }
 
-  100% {
-    transform: translateY(0);
+  .landing-copy h1 {
+    font-size: clamp(65px, 10vw, 115px);
+
+    letter-spacing: -6px;
+  }
+
+  .machine-card {
+    left: 8%;
+
+    width: 250px;
+  }
+
+  .big-number {
+    font-size: 150px;
   }
 }
 
@@ -429,42 +1050,655 @@
    ========================================================= */
 
 @media (max-width: 800px) {
-
   .landing-nav {
-    padding: 0 25px;
+    height: 72px;
+
+    padding:
+      0 22px;
+  }
+
+  .landing-status {
+    display: none;
   }
 
   .landing-main {
     grid-template-columns: 1fr;
+
+    min-height: auto;
   }
 
   .landing-copy {
-    min-height: 550px;
+    min-height: 600px;
 
-    padding: 60px 25px;
+    padding:
+      70px 25px
+      65px;
   }
 
   .landing-copy h1 {
-    font-size: 80px;
+    font-size: 78px;
 
     letter-spacing: -5px;
+
+    line-height: 0.82;
+  }
+
+  .landing-description {
+    font-size: 14px;
+
+    max-width: 370px;
+  }
+
+  .landing-enter {
+    padding: 17px 20px;
+
+    gap: 35px;
   }
 
   .landing-visual {
-    min-height: 450px;
+    min-height: 500px;
 
     border-left: none;
 
-    border-top: 1px solid #252525;
+    border-top:
+      1px solid
+      var(--line);
+  }
+
+  .visual-circle {
+    width: 380px;
+    height: 380px;
+
+    right: -100px;
+
+    top: 45%;
+  }
+
+  .machine-card {
+    left: 8%;
+
+    bottom: 18%;
+
+    width: 235px;
+
+    padding: 22px;
+  }
+
+  .big-number {
+    font-size: 130px;
+
+    right: 4%;
   }
 
   .landing-footer {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns:
+      repeat(2, 1fr);
 
-    padding: 0 25px;
+    min-height: 150px;
+
+    padding: 0 22px;
+  }
+
+  .landing-footer div {
+    min-height: 75px;
+
+    padding-left: 15px;
+  }
+
+  .landing-footer div:first-child {
+    padding-left: 0;
   }
 
   .scroll-text {
     display: none !important;
+  }
+}
+
+
+/* =========================================================
+   SMALL PHONES
+   ========================================================= */
+
+@media (max-width: 480px) {
+  .landing-copy {
+    min-height: 570px;
+
+    padding:
+      55px 22px;
+  }
+
+  .landing-copy h1 {
+    font-size: 65px;
+
+    letter-spacing: -4px;
+  }
+
+  .landing-description {
+    margin-top: 40px;
+  }
+
+  .landing-visual {
+    min-height: 430px;
+  }
+
+  .visual-circle {
+    width: 330px;
+    height: 330px;
+
+    right: -120px;
+  }
+
+  .machine-card {
+    left: 7%;
+
+    width: 210px;
+
+    padding: 20px;
+
+    box-shadow:
+      13px 13px 0
+      var(--yellow);
+  }
+
+  .machine-status {
+    font-size: 19px;
+  }
+
+  .big-number {
+    font-size: 105px;
+  }
+
+  .landing-footer strong {
+    font-size: 18px;
+  }
+}
+
+
+/* =========================================================
+   REDUCED MOTION ACCESSIBILITY
+   ========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+  .visual-circle,
+  .machine-card,
+  .visual-grid,
+  .status-dot,
+  .scroll-text::after {
+    animation: none;
+  }
+
+  * {
+    scroll-behavior: auto !important;
+  }
+}
+/* =========================================================
+   HERO META
+   ========================================================= */
+
+.hero-meta {
+  display: flex;
+  gap: 28px;
+
+  margin-top: 35px;
+
+  color: #4f4f4f;
+
+  font-size: 8px;
+
+  letter-spacing: 2px;
+
+  text-transform: uppercase;
+}
+
+.hero-meta span {
+  position: relative;
+}
+
+.hero-meta span:not(:last-child)::after {
+  content: "";
+
+  position: absolute;
+
+  right: -15px;
+  top: 50%;
+
+  width: 3px;
+  height: 3px;
+
+  background: #f3fb04;
+
+  transform: translateY(-50%);
+}
+
+
+/* =========================================================
+   MACHINE SYSTEM
+   ========================================================= */
+
+.machine-system {
+  position: absolute;
+
+  width: 300px;
+  height: 300px;
+
+  right: 18%;
+  top: 50%;
+
+  transform: translateY(-50%);
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  z-index: 3;
+}
+
+
+/* =========================================================
+   MACHINE RINGS
+   ========================================================= */
+
+.machine-ring {
+  position: absolute;
+
+  border-radius: 50%;
+
+  border: 1px solid rgba(243, 251, 4, 0.25);
+}
+
+.ring-one {
+  width: 300px;
+  height: 300px;
+
+  animation:
+    ringRotate 15s linear infinite;
+}
+
+.ring-two {
+  width: 220px;
+  height: 220px;
+
+  border-style: dashed;
+
+  border-color: rgba(243, 251, 4, 0.4);
+
+  animation:
+    ringRotateReverse 10s linear infinite;
+}
+
+
+/* =========================================================
+   MACHINE CORE
+   ========================================================= */
+
+.machine-core {
+  width: 115px;
+  height: 115px;
+
+  border:
+    1px solid
+    rgba(243, 251, 4, 0.8);
+
+  border-radius: 50%;
+
+  background:
+    radial-gradient(
+      circle,
+      rgba(243, 251, 4, 0.12),
+      #0b0b0b 65%
+    );
+
+  display: flex;
+  flex-direction: column;
+
+  align-items: center;
+  justify-content: center;
+
+  box-shadow:
+    0 0 40px
+    rgba(243, 251, 4, 0.08);
+
+  position: relative;
+}
+
+.machine-core::before {
+  content: "";
+
+  position: absolute;
+
+  inset: 8px;
+
+  border:
+    1px solid
+    rgba(243, 251, 4, 0.15);
+
+  border-radius: 50%;
+}
+
+.core-label {
+  font-size: 7px;
+
+  letter-spacing: 2px;
+
+  color: #666;
+}
+
+.machine-core strong {
+  color: #f3fb04;
+
+  font-size: 25px;
+
+  letter-spacing: -1px;
+
+  margin: 4px 0;
+}
+
+.core-status {
+  font-size: 6px;
+
+  letter-spacing: 1.5px;
+
+  color: #777;
+}
+
+.core-status::first-letter {
+  color: #f3fb04;
+}
+
+
+/* =========================================================
+   MACHINE DATA
+   ========================================================= */
+
+.machine-data {
+  display: grid;
+
+  grid-template-columns:
+    repeat(3, 1fr);
+
+  gap: 10px;
+
+  margin-top: 25px;
+
+  padding-top: 18px;
+
+  border-top:
+    1px solid
+    #292929;
+}
+
+.machine-data div {
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 5px;
+}
+
+.machine-data span {
+  font-size: 7px;
+
+  letter-spacing: 1.5px;
+
+  color: #666;
+}
+
+.machine-data strong {
+  font-size: 13px;
+
+  color: #eee;
+}
+
+
+/* =========================================================
+   FLOATING DATA TAGS
+   ========================================================= */
+
+.data-tag {
+  position: absolute;
+
+  z-index: 6;
+
+  padding: 9px 12px;
+
+  background:
+    rgba(10, 10, 10, 0.85);
+
+  border:
+    1px solid
+    #292929;
+
+  color: #777;
+
+  font-size: 7px;
+
+  letter-spacing: 1.5px;
+
+  backdrop-filter: blur(8px);
+
+  animation:
+    tagFloat 4s ease-in-out infinite;
+}
+
+.data-tag span {
+  color: #f3fb04;
+
+  margin-right: 8px;
+
+  font-weight: 900;
+}
+
+.tag-one {
+  top: 22%;
+
+  left: 10%;
+}
+
+.tag-two {
+  top: 70%;
+
+  right: 8%;
+
+  animation-delay: 1s;
+}
+
+.tag-three {
+  top: 48%;
+
+  left: 4%;
+
+  animation-delay: 2s;
+}
+
+
+/* =========================================================
+   COORDINATES
+   ========================================================= */
+
+.coordinates {
+  position: absolute;
+
+  left: 30px;
+  bottom: 30px;
+
+  z-index: 5;
+
+  color: #3f3f3f;
+
+  font-size: 7px;
+
+  line-height: 1.8;
+
+  letter-spacing: 2px;
+}
+
+
+/* =========================================================
+   VISUAL INDEX
+   ========================================================= */
+
+.visual-index {
+  position: absolute;
+
+  top: 30px;
+  right: 30px;
+
+  color: #4f4f4f;
+
+  font-size: 8px;
+
+  letter-spacing: 3px;
+
+  z-index: 6;
+}
+
+
+/* =========================================================
+   ANIMATIONS
+   ========================================================= */
+
+@keyframes ringRotate {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes ringRotateReverse {
+  from {
+    transform: rotate(360deg);
+  }
+
+  to {
+    transform: rotate(0deg);
+  }
+}
+
+@keyframes tagFloat {
+  0% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-6px);
+  }
+
+  100% {
+    transform: translateY(0);
+  }
+}
+
+
+/* =========================================================
+   BUTTON ARROW FIX
+   ========================================================= */
+
+.button-arrow {
+  font-size: 18px;
+
+  line-height: 1;
+
+  transition:
+    transform 0.3s ease;
+}
+
+.landing-enter:hover .button-arrow {
+  transform:
+    translate(4px, -4px);
+}
+
+
+/* =========================================================
+   MOBILE ADDITIONS
+   ========================================================= */
+
+@media (max-width: 800px) {
+
+  .hero-meta {
+    flex-wrap: wrap;
+
+    gap: 12px;
+  }
+
+  .machine-system {
+    right: 50%;
+
+    transform:
+      translate(50%, -50%);
+
+    width: 260px;
+    height: 260px;
+  }
+
+  .ring-one {
+    width: 260px;
+    height: 260px;
+  }
+
+  .ring-two {
+    width: 190px;
+    height: 190px;
+  }
+
+  .machine-core {
+    width: 100px;
+    height: 100px;
+  }
+
+  .data-tag {
+    transform: scale(0.85);
+  }
+
+  .tag-one {
+    left: 5%;
+  }
+
+  .tag-three {
+    left: 3%;
+  }
+
+  .coordinates {
+    display: none;
+  }
+}
+
+
+@media (max-width: 480px) {
+
+  .machine-system {
+    width: 230px;
+    height: 230px;
+  }
+
+  .ring-one {
+    width: 230px;
+    height: 230px;
+  }
+
+  .ring-two {
+    width: 165px;
+    height: 165px;
+  }
+
+  .machine-core {
+    width: 90px;
+    height: 90px;
+  }
+
+  .machine-core strong {
+    font-size: 20px;
+  }
+
+  .data-tag {
+    font-size: 6px;
+
+    padding: 7px 9px;
+  }
+
+  .tag-two {
+    right: 3%;
   }
 }

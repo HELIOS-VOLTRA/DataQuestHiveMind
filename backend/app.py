@@ -1422,6 +1422,87 @@ def downtime_impact(machine_id):
 # =========================================================
 # RUN FLASK
 # =========================================================
+@app.route("/api/service-history", methods=["GET"])
+def get_service_history():
+    conn = None
+    cursor = None
+
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor(dictionary=True)
+
+        cursor.execute("""
+            SELECT
+                a.assignment_id,
+                a.request_id,
+                sr.issue_description,
+                sr.priority,
+                sr.status,
+                sr.created_at,
+                a.assigned_at,
+                a.work_started_at,
+                a.work_completed_at,
+
+                m.machine_id,
+                m.machine_code,
+                m.machine_name,
+
+                t.technician_id,
+                u.name AS technician_name
+
+            FROM assignments a
+
+            INNER JOIN service_requests sr
+                ON a.request_id = sr.request_id
+
+            INNER JOIN machines m
+                ON sr.machine_id = m.machine_id
+
+            INNER JOIN technicians t
+                ON a.technician_id = t.technician_id
+
+            INNER JOIN users u
+                ON t.user_id = u.user_id
+
+            WHERE a.assignment_status = 'Completed'
+
+            ORDER BY
+                a.work_completed_at DESC,
+                a.assignment_id DESC
+        """)
+
+        history = cursor.fetchall()
+
+        for item in history:
+            if item["created_at"]:
+                item["created_at"] = item["created_at"].isoformat()
+
+            if item["assigned_at"]:
+                item["assigned_at"] = item["assigned_at"].isoformat()
+
+            if item["work_started_at"]:
+                item["work_started_at"] = item["work_started_at"].isoformat()
+
+            if item["work_completed_at"]:
+                item["work_completed_at"] = item["work_completed_at"].isoformat()
+
+        return jsonify({
+            "success": True,
+            "count": len(history),
+            "history": history
+        }), 200
+
+    except Exception as e:
+        return jsonify({
+            "success": False,
+            "error": str(e)
+        }), 500
+
+    finally:
+        if cursor:
+            cursor.close()
+        if conn:
+            conn.close()
 
 if __name__ == "__main__":
     app.run(

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import "./App.css";
 
 import ServiceRequests from "./pages/ServiceRequests";
@@ -139,80 +139,166 @@ function Dashboard({ setActivePage }) {
 }
 
 function ServiceHistory() {
-  const history = [
-    {
-      id: "SR-1001",
-      machine: "Hydraulic Press M-104",
-      issue: "Hydraulic pressure dropping",
-      technician: "Arjun Kumar",
-      status: "Completed",
-      date: "06 Oct 2026",
-      duration: "2h 34m",
-    },
-    {
-      id: "SR-1002",
-      machine: "CNC Machine M-102",
-      issue: "Inaccurate cuts",
-      technician: "Priya Sharma",
-      status: "Completed",
-      date: "05 Oct 2026",
-      duration: "3h 12m",
-    },
-    {
-      id: "SR-1003",
-      machine: "Air Compressor M-103",
-      issue: "Unusual vibration",
-      technician: "Rahul Singh",
-      status: "Completed",
-      date: "04 Oct 2026",
-      duration: "1h 48m",
-    },
-  ];
+  const API_BASE =
+    import.meta.env.VITE_API_URL ||
+    "http://localhost:5000";
+
+  const [history, setHistory] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    const loadHistory = async () => {
+      try {
+        setLoading(true);
+        setError("");
+
+        const response = await fetch(
+          `${API_BASE}/api/service-history`
+        );
+
+        if (!response.ok) {
+          throw new Error("Failed to load service history");
+        }
+
+        const data = await response.json();
+
+        if (!data.success) {
+          throw new Error(
+            data.error || "Failed to load service history"
+          );
+        }
+
+        setHistory(data.history || []);
+      } catch (err) {
+        console.error("Service history error:", err);
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadHistory();
+  }, [API_BASE]);
+
+  const formatDate = (dateString) => {
+    if (!dateString) return "—";
+
+    const date = new Date(dateString);
+
+    return date.toLocaleDateString("en-GB", {
+      day: "2-digit",
+      month: "short",
+      year: "numeric",
+    });
+  };
+
+  const calculateDuration = (start, end) => {
+    if (!start || !end) return "—";
+
+    const startTime = new Date(start);
+    const endTime = new Date(end);
+
+    const minutes = Math.max(
+      0,
+      Math.round((endTime - startTime) / 60000)
+    );
+
+    const hours = Math.floor(minutes / 60);
+    const remainingMinutes = minutes % 60;
+
+    if (hours === 0) {
+      return `${remainingMinutes}m`;
+    }
+
+    return `${hours}h ${remainingMinutes}m`;
+  };
 
   return (
     <div className="page-container">
       <div className="page-header">
         <div>
           <h1>Service History</h1>
-          <p>Review completed maintenance and service activities.</p>
+          <p>
+            Review completed maintenance and service activities.
+          </p>
         </div>
       </div>
 
       <div className="dashboard-card">
-        <div className="history-list">
-          {history.map((item) => (
-            <div className="history-card" key={item.id}>
-              <div className="history-top">
-                <div>
-                  <span className="request-id">{item.id}</span>
-                  <h3>{item.machine}</h3>
+        {loading && (
+          <div className="empty-state">
+            <p>Loading service history...</p>
+          </div>
+        )}
+
+        {!loading && error && (
+          <div className="empty-state">
+            <p>Unable to load service history.</p>
+            <small>{error}</small>
+          </div>
+        )}
+
+        {!loading && !error && history.length === 0 && (
+          <div className="empty-state">
+            <p>No completed service activities yet.</p>
+          </div>
+        )}
+
+        {!loading && !error && history.length > 0 && (
+          <div className="history-list">
+            {history.map((item) => (
+              <div
+                className="history-card"
+                key={item.assignment_id}
+              >
+                <div className="history-top">
+                  <div>
+                    <span className="request-id">
+                      SR-{String(item.request_id).padStart(4, "0")}
+                    </span>
+
+                    <h3>
+                      {item.machine_name}{" "}
+                      {item.machine_code}
+                    </h3>
+                  </div>
+
+                  <span className="status-completed">
+                    {item.status}
+                  </span>
                 </div>
 
-                <span className="status-completed">{item.status}</span>
+                <p>{item.issue_description}</p>
+
+                <div className="history-details">
+                  <span>
+                    <strong>Technician:</strong>{" "}
+                    {item.technician_name}
+                  </span>
+
+                  <span>
+                    <strong>Date:</strong>{" "}
+                    {formatDate(item.work_completed_at)}
+                  </span>
+
+                  <span>
+                    <strong>Duration:</strong>{" "}
+                    {calculateDuration(
+                      item.work_started_at,
+                      item.work_completed_at
+                    )}
+                  </span>
+                </div>
               </div>
-
-              <p>{item.issue}</p>
-
-              <div className="history-details">
-                <span>
-                  <strong>Technician:</strong> {item.technician}
-                </span>
-
-                <span>
-                  <strong>Date:</strong> {item.date}
-                </span>
-
-                <span>
-                  <strong>Duration:</strong> {item.duration}
-                </span>
-              </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );
 }
+  
 
 function App() {
   const [activePage, setActivePage] = useState("dashboard");

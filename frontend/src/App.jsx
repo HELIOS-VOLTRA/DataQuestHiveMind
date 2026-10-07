@@ -5,6 +5,7 @@ import ServiceRequests from "./pages/ServiceRequests";
 import Technicians from "./pages/Technicians";
 import SpareParts from "./pages/SpareParts";
 import Notifications from "./pages/Notifications";
+import SmartOperations from "./pages/SmartOperations";
 import Equipment from "./Equipment";
 
 function Dashboard({ setActivePage }) {
@@ -66,6 +67,10 @@ function Dashboard({ setActivePage }) {
             <button onClick={() => setActivePage("spare-parts")}>
               Check Spare Parts
             </button>
+
+            <button onClick={() => setActivePage("smart-operations")}>
+              Open HiveMind Intelligence
+            </button>
           </div>
         </div>
 
@@ -100,6 +105,7 @@ function Dashboard({ setActivePage }) {
         <div className="activity-list">
           <div className="activity-item">
             <span className="activity-dot urgent"></span>
+
             <div>
               <strong>Urgent service request</strong>
               <p>CNC Machine M-102 requires immediate attention.</p>
@@ -108,6 +114,7 @@ function Dashboard({ setActivePage }) {
 
           <div className="activity-item">
             <span className="activity-dot"></span>
+
             <div>
               <strong>Technician assigned</strong>
               <p>Technician assignment updated for SR-1002.</p>
@@ -116,9 +123,12 @@ function Dashboard({ setActivePage }) {
 
           <div className="activity-item">
             <span className="activity-dot warning"></span>
+
             <div>
               <strong>Low stock alert</strong>
-              <p>Hydraulic Seal Kit has reached its minimum stock level.</p>
+              <p>
+                Hydraulic Seal Kit has reached its minimum stock level.
+              </p>
             </div>
           </div>
         </div>
@@ -242,6 +252,11 @@ function App() {
       label: "Service History",
       icon: "🕘",
     },
+    {
+      id: "smart-operations",
+      label: "HiveMind Intelligence",
+      icon: "🧠",
+    },
   ];
 
   const renderPage = () => {
@@ -266,6 +281,9 @@ function App() {
 
       case "service-history":
         return <ServiceHistory />;
+
+      case "smart-operations":
+        return <SmartOperations />;
 
       default:
         return <Dashboard setActivePage={setActivePage} />;
@@ -338,7 +356,9 @@ function App() {
           </div>
         </header>
 
-        <section className="content-area">{renderPage()}</section>
+        <section className="content-area">
+          {renderPage()}
+        </section>
       </main>
     </div>
   );

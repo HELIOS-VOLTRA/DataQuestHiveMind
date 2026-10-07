@@ -99,3 +99,36 @@ CREATE TABLE technicians (
     FOREIGN KEY (user_id)
         REFERENCES users(user_id)
 );
+-- ============================================
+-- SKILLS
+-- Stores skills that technicians can have
+-- ============================================
+
+CREATE TABLE skills (
+    skill_id INT AUTO_INCREMENT PRIMARY KEY,
+
+    skill_name VARCHAR(100) NOT NULL UNIQUE,
+
+    description VARCHAR(255)
+);
+-- ============================================
+-- TECHNICIAN SKILLS
+-- Links technicians to their skills
+-- Many-to-many relationship
+-- ============================================
+
+CREATE TABLE technician_skills (
+    technician_id INT NOT NULL,
+
+    skill_id INT NOT NULL,
+
+    proficiency_level VARCHAR(50) DEFAULT 'Intermediate',
+
+    PRIMARY KEY (technician_id, skill_id),
+
+    FOREIGN KEY (technician_id)
+        REFERENCES technicians(technician_id),
+
+    FOREIGN KEY (skill_id)
+        REFERENCES skills(skill_id)
+);

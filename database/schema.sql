@@ -75,6 +75,8 @@ CREATE TABLE machines (
     FOREIGN KEY (site_id)
         REFERENCES sites(site_id)
 );
+
+
 -- ============================================
 -- TECHNICIANS
 -- Stores technician-specific information
@@ -99,6 +101,8 @@ CREATE TABLE technicians (
     FOREIGN KEY (user_id)
         REFERENCES users(user_id)
 );
+
+
 -- ============================================
 -- SKILLS
 -- Stores skills that technicians can have
@@ -111,6 +115,8 @@ CREATE TABLE skills (
 
     description VARCHAR(255)
 );
+
+
 -- ============================================
 -- TECHNICIAN SKILLS
 -- Links technicians to their skills
@@ -132,6 +138,8 @@ CREATE TABLE technician_skills (
     FOREIGN KEY (skill_id)
         REFERENCES skills(skill_id)
 );
+
+
 -- ============================================
 -- SERVICE REQUESTS
 -- Stores maintenance/service requests
@@ -169,6 +177,8 @@ CREATE TABLE service_requests (
     FOREIGN KEY (required_skill_id)
         REFERENCES skills(skill_id)
 );
+
+
 -- ============================================
 -- ASSIGNMENTS
 -- Links service requests to technicians
@@ -198,6 +208,8 @@ CREATE TABLE assignments (
     FOREIGN KEY (technician_id)
         REFERENCES technicians(technician_id)
 );
+
+
 -- ============================================
 -- SPARE PARTS
 -- Stores spare parts/resources used for servicing
@@ -216,6 +228,8 @@ CREATE TABLE spare_parts (
 
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+
 -- ============================================
 -- PART INVENTORY
 -- Tracks spare-part availability at each site
@@ -243,6 +257,8 @@ CREATE TABLE part_inventory (
 
     UNIQUE (part_id, site_id)
 );
+
+
 -- ============================================
 -- REQUEST PARTS
 -- Stores spare parts required for service requests

@@ -1,0 +1,470 @@
+.landing {
+  min-height: 100vh;
+  background: #0a0a0a;
+  color: #f4f4ed;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+
+/* =========================================================
+   NAVIGATION
+   ========================================================= */
+
+.landing-nav {
+  height: 90px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 5vw;
+  border-bottom: 1px solid #252525;
+}
+
+.landing-brand {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.landing-logo {
+  width: 44px;
+  height: 44px;
+  background: #f3fb04;
+  color: #0a0a0a;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  font-size: 15px;
+  font-weight: 900;
+}
+
+.landing-brand-text {
+  display: flex;
+  flex-direction: column;
+  line-height: 1;
+}
+
+.landing-brand-text strong {
+  font-size: 14px;
+  letter-spacing: 2px;
+}
+
+.landing-brand-text span {
+  margin-top: 5px;
+  font-size: 10px;
+  color: #888;
+  letter-spacing: 3px;
+}
+
+.landing-status {
+  font-size: 11px;
+  letter-spacing: 2px;
+  color: #999;
+
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+
+.status-dot {
+  width: 8px;
+  height: 8px;
+
+  background: #f3fb04;
+
+  border-radius: 50%;
+
+  box-shadow: 0 0 15px #f3fb04;
+}
+
+
+/* =========================================================
+   MAIN
+   ========================================================= */
+
+.landing-main {
+  flex: 1;
+
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+
+  min-height: 650px;
+}
+
+
+/* =========================================================
+   LEFT SIDE
+   ========================================================= */
+
+.landing-copy {
+  padding: 8vh 5vw;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+
+  position: relative;
+  z-index: 2;
+}
+
+.landing-kicker {
+  font-size: 11px;
+  letter-spacing: 3px;
+  color: #888;
+
+  margin-bottom: 30px;
+}
+
+.landing-copy h1 {
+  margin: 0;
+
+  font-size: clamp(70px, 9vw, 150px);
+
+  line-height: 0.82;
+
+  letter-spacing: -8px;
+
+  font-weight: 900;
+}
+
+.landing-copy h1 span {
+  color: #f3fb04;
+}
+
+.landing-description {
+  max-width: 420px;
+
+  margin-top: 45px;
+
+  color: #999;
+
+  font-size: 17px;
+
+  line-height: 1.6;
+}
+
+
+/* =========================================================
+   BUTTON
+   ========================================================= */
+
+.landing-enter {
+  margin-top: 35px;
+
+  width: fit-content;
+
+  border: none;
+
+  background: #f3fb04;
+  color: #0a0a0a;
+
+  padding: 18px 25px;
+
+  font-size: 12px;
+
+  font-weight: 800;
+
+  letter-spacing: 1.5px;
+
+  display: flex;
+
+  gap: 40px;
+
+  align-items: center;
+
+  cursor: pointer;
+
+  transition:
+    transform 0.25s ease,
+    background 0.25s ease,
+    box-shadow 0.25s ease;
+}
+
+.landing-enter:hover {
+  transform: translateX(8px);
+
+  background: #ffff66;
+
+  box-shadow: 0 0 25px rgba(243, 251, 4, 0.25);
+}
+
+
+/* =========================================================
+   RIGHT SIDE
+   ========================================================= */
+
+.landing-visual {
+  position: relative;
+
+  overflow: hidden;
+
+  border-left: 1px solid #252525;
+
+  background: #111;
+}
+
+.visual-grid {
+  position: absolute;
+
+  inset: 0;
+
+  background-image:
+    linear-gradient(#242424 1px, transparent 1px),
+    linear-gradient(90deg, #242424 1px, transparent 1px);
+
+  background-size: 60px 60px;
+
+  opacity: 0.45;
+}
+
+.visual-circle {
+  position: absolute;
+
+  width: 450px;
+  height: 450px;
+
+  border: 1px solid #f3fb04;
+
+  border-radius: 50%;
+
+  right: -100px;
+  top: 100px;
+
+  opacity: 0.8;
+
+  animation: rotateCircle 20s linear infinite;
+}
+
+.visual-line {
+  position: absolute;
+
+  height: 2px;
+
+  background: #f3fb04;
+
+  width: 65%;
+
+  transform: rotate(-35deg);
+
+  right: -40px;
+}
+
+.line-one {
+  top: 35%;
+}
+
+.line-two {
+  top: 55%;
+
+  opacity: 0.35;
+}
+
+
+/* =========================================================
+   MACHINE CARD
+   ========================================================= */
+
+.machine-card {
+  position: absolute;
+
+  left: 12%;
+  bottom: 18%;
+
+  width: 260px;
+
+  padding: 25px;
+
+  background: #181818;
+
+  border: 1px solid #333;
+
+  box-shadow: 20px 20px 0 #f3fb04;
+
+  animation: floatCard 4s ease-in-out infinite;
+}
+
+.machine-card-top {
+  font-size: 10px;
+
+  color: #777;
+
+  letter-spacing: 2px;
+
+  margin-bottom: 25px;
+}
+
+.machine-status {
+  color: #f3fb04;
+
+  font-size: 20px;
+
+  font-weight: 800;
+
+  margin-bottom: 10px;
+}
+
+.machine-location {
+  color: #aaa;
+
+  font-size: 10px;
+
+  letter-spacing: 1px;
+}
+
+
+/* =========================================================
+   NUMBER
+   ========================================================= */
+
+.big-number {
+  position: absolute;
+
+  right: 10%;
+  bottom: 8%;
+
+  font-size: 160px;
+
+  font-weight: 900;
+
+  color: transparent;
+
+  -webkit-text-stroke: 1px #444;
+
+  line-height: 1;
+}
+
+
+/* =========================================================
+   FOOTER
+   ========================================================= */
+
+.landing-footer {
+  min-height: 90px;
+
+  border-top: 1px solid #252525;
+
+  display: grid;
+
+  grid-template-columns:
+    repeat(4, 1fr)
+    1.5fr;
+
+  padding: 0 5vw;
+}
+
+.landing-footer div {
+  display: flex;
+
+  flex-direction: column;
+
+  justify-content: center;
+
+  border-right: 1px solid #252525;
+
+  padding-left: 20px;
+}
+
+.landing-footer strong {
+  font-size: 22px;
+
+  color: #f3fb04;
+}
+
+.landing-footer span {
+  margin-top: 5px;
+
+  color: #777;
+
+  font-size: 9px;
+
+  letter-spacing: 2px;
+}
+
+.scroll-text {
+  align-items: flex-end;
+
+  color: #777;
+
+  font-size: 10px;
+
+  letter-spacing: 2px;
+}
+
+
+/* =========================================================
+   ANIMATIONS
+   ========================================================= */
+
+@keyframes rotateCircle {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes floatCard {
+  0% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-10px);
+  }
+
+  100% {
+    transform: translateY(0);
+  }
+}
+
+
+/* =========================================================
+   MOBILE
+   ========================================================= */
+
+@media (max-width: 800px) {
+
+  .landing-nav {
+    padding: 0 25px;
+  }
+
+  .landing-main {
+    grid-template-columns: 1fr;
+  }
+
+  .landing-copy {
+    min-height: 550px;
+
+    padding: 60px 25px;
+  }
+
+  .landing-copy h1 {
+    font-size: 80px;
+
+    letter-spacing: -5px;
+  }
+
+  .landing-visual {
+    min-height: 450px;
+
+    border-left: none;
+
+    border-top: 1px solid #252525;
+  }
+
+  .landing-footer {
+    grid-template-columns: repeat(2, 1fr);
+
+    padding: 0 25px;
+  }
+
+  .scroll-text {
+    display: none !important;
+  }
+}

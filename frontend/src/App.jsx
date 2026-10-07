@@ -6,6 +6,7 @@ import Technicians from "./pages/Technicians";
 import SpareParts from "./pages/SpareParts";
 import Notifications from "./pages/Notifications";
 import Equipment from "./Equipment";
+import Landing from "./pages/Landing";
 
 function Dashboard({ setActivePage }) {
   return (
@@ -100,6 +101,7 @@ function Dashboard({ setActivePage }) {
         <div className="activity-list">
           <div className="activity-item">
             <span className="activity-dot urgent"></span>
+
             <div>
               <strong>Urgent service request</strong>
               <p>CNC Machine M-102 requires immediate attention.</p>
@@ -108,6 +110,7 @@ function Dashboard({ setActivePage }) {
 
           <div className="activity-item">
             <span className="activity-dot"></span>
+
             <div>
               <strong>Technician assigned</strong>
               <p>Technician assignment updated for SR-1002.</p>
@@ -116,9 +119,12 @@ function Dashboard({ setActivePage }) {
 
           <div className="activity-item">
             <span className="activity-dot warning"></span>
+
             <div>
               <strong>Low stock alert</strong>
-              <p>Hydraulic Seal Kit has reached its minimum stock level.</p>
+              <p>
+                Hydraulic Seal Kit has reached its minimum stock level.
+              </p>
             </div>
           </div>
         </div>
@@ -126,6 +132,7 @@ function Dashboard({ setActivePage }) {
     </div>
   );
 }
+
 
 function ServiceHistory() {
   const history = [
@@ -203,8 +210,12 @@ function ServiceHistory() {
   );
 }
 
+
 function App() {
   const [activePage, setActivePage] = useState("dashboard");
+
+  // Controls whether the landing page is visible
+  const [showLanding, setShowLanding] = useState(true);
 
   const navigation = [
     {
@@ -244,6 +255,7 @@ function App() {
     },
   ];
 
+
   const renderPage = () => {
     switch (activePage) {
       case "dashboard":
@@ -272,11 +284,27 @@ function App() {
     }
   };
 
+
+  // Show the new landing page first
+  if (showLanding) {
+    return (
+      <Landing
+        onEnter={() => setShowLanding(false)}
+      />
+    );
+  }
+
+
+  // Main application
   return (
     <div className="app-shell">
+
       <aside className="sidebar">
+
         <div className="brand">
-          <div className="brand-logo">DQ</div>
+          <div className="brand-logo">
+            DQ
+          </div>
 
           <div>
             <h2>DataQuest</h2>
@@ -284,8 +312,12 @@ function App() {
           </div>
         </div>
 
+
         <div className="sidebar-section">
-          <span className="sidebar-title">OPERATIONS</span>
+
+          <span className="sidebar-title">
+            OPERATIONS
+          </span>
 
           <nav>
             {navigation.map((item) => (
@@ -296,52 +328,94 @@ function App() {
                 }`}
                 onClick={() => setActivePage(item.id)}
               >
-                <span className="nav-icon">{item.icon}</span>
-                <span>{item.label}</span>
+                <span className="nav-icon">
+                  {item.icon}
+                </span>
+
+                <span>
+                  {item.label}
+                </span>
               </button>
             ))}
           </nav>
+
         </div>
 
+
         <div className="sidebar-bottom">
+
           <div className="system-status">
+
             <span className="status-indicator"></span>
 
             <div>
-              <strong>System Online</strong>
-              <small>All services operational</small>
+              <strong>
+                System Online
+              </strong>
+
+              <small>
+                All services operational
+              </small>
             </div>
+
           </div>
+
         </div>
+
       </aside>
 
+
       <main className="main-content">
+
         <header className="topbar">
+
           <div>
-            <span className="breadcrumb">DataQuest HiveMind</span>
+            <span className="breadcrumb">
+              DataQuest HiveMind
+            </span>
           </div>
 
+
           <div className="topbar-right">
+
             <span className="live-indicator">
               <span></span>
               Live
             </span>
 
+
             <div className="user-profile">
-              <div className="avatar">G</div>
+
+              <div className="avatar">
+                G
+              </div>
 
               <div>
-                <strong>Admin</strong>
-                <small>Operations Manager</small>
+                <strong>
+                  Admin
+                </strong>
+
+                <small>
+                  Operations Manager
+                </small>
               </div>
+
             </div>
+
           </div>
+
         </header>
 
-        <section className="content-area">{renderPage()}</section>
+
+        <section className="content-area">
+          {renderPage()}
+        </section>
+
       </main>
+
     </div>
   );
 }
+
 
 export default App;

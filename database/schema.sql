@@ -243,3 +243,27 @@ CREATE TABLE part_inventory (
 
     UNIQUE (part_id, site_id)
 );
+-- ============================================
+-- REQUEST PARTS
+-- Stores spare parts required for service requests
+-- ============================================
+
+CREATE TABLE request_parts (
+    request_part_id INT AUTO_INCREMENT PRIMARY KEY,
+
+    request_id INT NOT NULL,
+
+    part_id INT NOT NULL,
+
+    quantity_required INT NOT NULL DEFAULT 1,
+
+    quantity_used INT NOT NULL DEFAULT 0,
+
+    FOREIGN KEY (request_id)
+        REFERENCES service_requests(request_id),
+
+    FOREIGN KEY (part_id)
+        REFERENCES spare_parts(part_id),
+
+    UNIQUE (request_id, part_id)
+);

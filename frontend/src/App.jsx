@@ -1,9 +1,13 @@
 import { useState } from "react";
 import "./App.css";
+
 import ServiceRequests from "./pages/ServiceRequests";
+import Technicians from "./pages/Technicians";
+import SpareParts from "./pages/SpareParts";
+import Notifications from "./pages/Notifications";
 
 function App() {
-  const [currentPage, setCurrentPage] = useState("dashboard");
+  const [page, setPage] = useState("dashboard");
 
   const requests = [
     {
@@ -26,10 +30,312 @@ function App() {
     },
   ];
 
-  return (
-    <div className="app">
-      {/* SIDEBAR */}
+  const handleNavigation = (selectedPage) => {
+    setPage(selectedPage);
+  };
+
+  /* =========================
+     DASHBOARD
+  ========================= */
+
+  const Dashboard = () => {
+    return (
+      <main className="main">
+        <header className="header">
+          <div>
+            <p className="eyebrow">OPERATIONS CENTER</p>
+            <h1>Dashboard</h1>
+          </div>
+
+          <div className="header-right">
+            <button
+              className="notification-button"
+              onClick={() => handleNavigation("notifications")}
+            >
+              🔔
+            </button>
+
+            <div className="user">
+              <div className="avatar">A</div>
+
+              <div>
+                <strong>Admin User</strong>
+                <span>Operations Manager</span>
+              </div>
+            </div>
+          </div>
+        </header>
+
+        {/* WELCOME */}
+        <section className="welcome">
+          <div>
+            <h2>Good morning, Admin.</h2>
+
+            <p>
+              Here's what's happening across your equipment
+              service operations.
+            </p>
+          </div>
+
+          <button
+            className="primary-button"
+            onClick={() => handleNavigation("service-requests")}
+          >
+            + Create Service Request
+          </button>
+        </section>
+
+        {/* STATISTICS */}
+        <section className="stats">
+          <div className="stat-card">
+            <span>Pending Requests</span>
+            <strong>24</strong>
+            <small>↑ 8% from yesterday</small>
+          </div>
+
+          <div className="stat-card">
+            <span>Active Services</span>
+            <strong>8</strong>
+            <small>5 technicians on site</small>
+          </div>
+
+          <div className="stat-card urgent">
+            <span>Urgent Issues</span>
+            <strong>3</strong>
+            <small>Requires attention</small>
+          </div>
+
+          <div className="stat-card">
+            <span>Available Technicians</span>
+            <strong>12</strong>
+            <small>Across 4 locations</small>
+          </div>
+        </section>
+
+        {/* CONTENT */}
+        <section className="content-grid">
+          {/* SERVICE REQUESTS */}
+          <div className="panel requests-panel">
+            <div className="panel-header">
+              <div>
+                <p className="eyebrow">LIVE OPERATIONS</p>
+                <h2>Recent Service Requests</h2>
+              </div>
+
+              <button
+                className="text-button"
+                onClick={() =>
+                  handleNavigation("service-requests")
+                }
+              >
+                View all →
+              </button>
+            </div>
+
+            <div className="request-list">
+              {requests.map((request) => (
+                <div
+                  className="request-row"
+                  key={request.id}
+                >
+                  <div className="machine-icon">⚙</div>
+
+                  <div className="request-info">
+                    <strong>{request.id}</strong>
+                    <span>{request.site}</span>
+                  </div>
+
+                  <span
+                    className={`priority ${request.priority.toLowerCase()}`}
+                  >
+                    {request.priority}
+                  </span>
+
+                  <span
+                    className={`status ${request.status
+                      .toLowerCase()
+                      .replace(" ", "-")}`}
+                  >
+                    {request.status}
+                  </span>
+
+                  <button
+                    className="arrow-button"
+                    onClick={() =>
+                      handleNavigation("service-requests")
+                    }
+                  >
+                    →
+                  </button>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* ALERTS */}
+          <div className="panel alerts-panel">
+            <div className="panel-header">
+              <div>
+                <p className="eyebrow">ATTENTION</p>
+                <h2>Alerts</h2>
+              </div>
+
+              <span className="alert-count">3</span>
+            </div>
+
+            <div className="alert">
+              <div className="alert-icon">!</div>
+
+              <div>
+                <strong>Technician unavailable</strong>
+                <span>M-104 · Site A</span>
+              </div>
+            </div>
+
+            <div className="alert">
+              <div className="alert-icon">!</div>
+
+              <div>
+                <strong>Spare part running low</strong>
+                <span>
+                  Motor Coupling · 2 remaining
+                </span>
+              </div>
+            </div>
+
+            <div className="alert">
+              <div className="alert-icon">!</div>
+
+              <div>
+                <strong>SLA approaching</strong>
+                <span>
+                  M-208 · 45 minutes remaining
+                </span>
+              </div>
+            </div>
+          </div>
+        </section>
+      </main>
+    );
+  };
+
+  /* =========================
+     PLACEHOLDER EQUIPMENT PAGE
+  ========================= */
+
+  const Equipment = () => {
+    return (
+      <main className="main">
+        <header className="header">
+          <div>
+            <p className="eyebrow">OPERATIONS CENTER</p>
+            <h1>Equipment</h1>
+          </div>
+
+          <div className="header-right">
+            <button
+              className="notification-button"
+              onClick={() => handleNavigation("notifications")}
+            >
+              🔔
+            </button>
+
+            <div className="user">
+              <div className="avatar">A</div>
+
+              <div>
+                <strong>Admin User</strong>
+                <span>Operations Manager</span>
+              </div>
+            </div>
+          </div>
+        </header>
+
+        <section className="welcome">
+          <div>
+            <h2>Equipment Management</h2>
+
+            <p>
+              Monitor equipment condition, maintenance status
+              and operational health.
+            </p>
+          </div>
+        </section>
+
+        <section className="panel">
+          <div className="panel-header">
+            <div>
+              <p className="eyebrow">FIELD OPERATIONS</p>
+              <h2>Equipment Overview</h2>
+            </div>
+          </div>
+
+          <div className="request-list">
+            <div className="request-row">
+              <div className="machine-icon">⚙</div>
+
+              <div className="request-info">
+                <strong>M-104</strong>
+                <span>Site A · Motor</span>
+              </div>
+
+              <span className="status pending">
+                Maintenance Required
+              </span>
+            </div>
+
+            <div className="request-row">
+              <div className="machine-icon">⚙</div>
+
+              <div className="request-info">
+                <strong>M-208</strong>
+                <span>Site B · Hydraulic System</span>
+              </div>
+
+              <span className="status active">
+                Operational
+              </span>
+            </div>
+
+            <div className="request-row">
+              <div className="machine-icon">⚙</div>
+
+              <div className="request-info">
+                <strong>M-301</strong>
+                <span>Site C · Production Unit</span>
+              </div>
+
+              <span className="status active">
+                Operational
+              </span>
+            </div>
+
+            <div className="request-row">
+              <div className="machine-icon">⚙</div>
+
+              <div className="request-info">
+                <strong>M-401</strong>
+                <span>Site D · Industrial Motor</span>
+              </div>
+
+              <span className="status urgent">
+                Attention Required
+              </span>
+            </div>
+          </div>
+        </section>
+      </main>
+    );
+  };
+
+  /* =========================
+     SIDEBAR
+  ========================= */
+
+  const Sidebar = () => {
+    return (
       <aside className="sidebar">
+        {/* LOGO */}
         <div className="logo">
           <div className="logo-mark">D</div>
 
@@ -39,36 +345,85 @@ function App() {
           </div>
         </div>
 
+        {/* NAVIGATION */}
         <nav>
           <button
             className={`nav-item ${
-              currentPage === "dashboard" ? "active" : ""
+              page === "dashboard" ? "active" : ""
             }`}
-            onClick={() => setCurrentPage("dashboard")}
+            onClick={() => handleNavigation("dashboard")}
           >
             Dashboard
           </button>
 
           <button
             className={`nav-item ${
-              currentPage === "requests" ? "active" : ""
+              page === "service-requests"
+                ? "active"
+                : ""
             }`}
-            onClick={() => setCurrentPage("requests")}
+            onClick={() =>
+              handleNavigation("service-requests")
+            }
           >
             Service Requests
           </button>
 
-          <button className="nav-item">Equipment</button>
+          <button
+            className={`nav-item ${
+              page === "equipment" ? "active" : ""
+            }`}
+            onClick={() => handleNavigation("equipment")}
+          >
+            Equipment
+          </button>
 
-          <button className="nav-item">Technicians</button>
+          <button
+            className={`nav-item ${
+              page === "technicians" ? "active" : ""
+            }`}
+            onClick={() => handleNavigation("technicians")}
+          >
+            Technicians
+          </button>
 
-          <button className="nav-item">Spare Parts</button>
+          <button
+            className={`nav-item ${
+              page === "spare-parts" ? "active" : ""
+            }`}
+            onClick={() =>
+              handleNavigation("spare-parts")
+            }
+          >
+            Spare Parts
+          </button>
 
-          <button className="nav-item">Notifications</button>
+          <button
+            className={`nav-item ${
+              page === "notifications" ? "active" : ""
+            }`}
+            onClick={() =>
+              handleNavigation("notifications")
+            }
+          >
+            Notifications
+          </button>
 
-          <button className="nav-item">Service History</button>
+          <button
+            className={`nav-item ${
+              page === "service-history"
+                ? "active"
+                : ""
+            }`}
+            onClick={() =>
+              handleNavigation("service-history")
+            }
+          >
+            Service History
+          </button>
         </nav>
 
+        {/* FOOTER */}
         <div className="sidebar-footer">
           <span>System Status</span>
 
@@ -77,187 +432,146 @@ function App() {
           </strong>
         </div>
       </aside>
+    );
+  };
 
-      {/* MAIN CONTENT */}
-      {currentPage === "dashboard" ? (
-        <main className="main">
-          {/* HEADER */}
-          <header className="header">
-            <div>
-              <p className="eyebrow">OPERATIONS CENTER</p>
-              <h1>Dashboard</h1>
-            </div>
+  /* =========================
+     SERVICE HISTORY
+  ========================= */
 
-            <div className="header-right">
-              <button className="notification-button">🔔</button>
+  const ServiceHistory = () => {
+    return (
+      <main className="main">
+        <header className="header">
+          <div>
+            <p className="eyebrow">OPERATIONS CENTER</p>
+            <h1>Service History</h1>
+          </div>
 
-              <div className="user">
-                <div className="avatar">A</div>
-
-                <div>
-                  <strong>Admin User</strong>
-                  <span>Operations Manager</span>
-                </div>
-              </div>
-            </div>
-          </header>
-
-          {/* WELCOME */}
-          <section className="welcome">
-            <div>
-              <h2>Good morning, Admin.</h2>
-
-              <p>
-                Here's what's happening across your equipment service
-                operations.
-              </p>
-            </div>
-
+          <div className="header-right">
             <button
-              className="primary-button"
-              onClick={() => setCurrentPage("requests")}
+              className="notification-button"
+              onClick={() =>
+                handleNavigation("notifications")
+              }
             >
-              + Create Service Request
+              🔔
             </button>
-          </section>
 
-          {/* STATISTICS */}
-          <section className="stats">
-            <div className="stat-card">
-              <span>Pending Requests</span>
+            <div className="user">
+              <div className="avatar">A</div>
 
-              <strong>24</strong>
-
-              <small>↑ 8% from yesterday</small>
-            </div>
-
-            <div className="stat-card">
-              <span>Active Services</span>
-
-              <strong>8</strong>
-
-              <small>5 technicians on site</small>
-            </div>
-
-            <div className="stat-card urgent">
-              <span>Urgent Issues</span>
-
-              <strong>3</strong>
-
-              <small>Requires attention</small>
-            </div>
-
-            <div className="stat-card">
-              <span>Available Technicians</span>
-
-              <strong>12</strong>
-
-              <small>Across 4 locations</small>
-            </div>
-          </section>
-
-          {/* CONTENT GRID */}
-          <section className="content-grid">
-            {/* RECENT REQUESTS */}
-            <div className="panel requests-panel">
-              <div className="panel-header">
-                <div>
-                  <p className="eyebrow">LIVE OPERATIONS</p>
-
-                  <h2>Recent Service Requests</h2>
-                </div>
-
-                <button
-                  className="text-button"
-                  onClick={() => setCurrentPage("requests")}
-                >
-                  View all →
-                </button>
-              </div>
-
-              <div className="request-list">
-                {requests.map((request) => (
-                  <div className="request-row" key={request.id}>
-                    <div className="machine-icon">⚙</div>
-
-                    <div className="request-info">
-                      <strong>{request.id}</strong>
-
-                      <span>{request.site}</span>
-                    </div>
-
-                    <span
-                      className={`priority ${request.priority.toLowerCase()}`}
-                    >
-                      {request.priority}
-                    </span>
-
-                    <span
-                      className={`status ${request.status
-                        .toLowerCase()
-                        .replace(" ", "-")}`}
-                    >
-                      {request.status}
-                    </span>
-
-                    <button
-                      className="arrow-button"
-                      onClick={() => setCurrentPage("requests")}
-                    >
-                      →
-                    </button>
-                  </div>
-                ))}
+              <div>
+                <strong>Admin User</strong>
+                <span>Operations Manager</span>
               </div>
             </div>
+          </div>
+        </header>
 
-            {/* ALERTS */}
-            <div className="panel alerts-panel">
-              <div className="panel-header">
-                <div>
-                  <p className="eyebrow">ATTENTION</p>
+        <section className="welcome">
+          <div>
+            <h2>Service History</h2>
 
-                  <h2>Alerts</h2>
-                </div>
+            <p>
+              Review completed service requests and
+              maintenance activity.
+            </p>
+          </div>
+        </section>
 
-                <span className="alert-count">3</span>
-              </div>
-
-              <div className="alert">
-                <div className="alert-icon">!</div>
-
-                <div>
-                  <strong>Technician unavailable</strong>
-
-                  <span>M-104 · Site A</span>
-                </div>
-              </div>
-
-              <div className="alert">
-                <div className="alert-icon">!</div>
-
-                <div>
-                  <strong>Spare part running low</strong>
-
-                  <span>Motor Coupling · 2 remaining</span>
-                </div>
-              </div>
-
-              <div className="alert">
-                <div className="alert-icon">!</div>
-
-                <div>
-                  <strong>SLA approaching</strong>
-
-                  <span>M-208 · 45 minutes remaining</span>
-                </div>
-              </div>
+        <section className="panel">
+          <div className="panel-header">
+            <div>
+              <p className="eyebrow">SERVICE RECORDS</p>
+              <h2>Recent Completed Services</h2>
             </div>
-          </section>
-        </main>
-      ) : (
-        <ServiceRequests />
-      )}
+          </div>
+
+          <div className="request-list">
+            <div className="request-row">
+              <div className="machine-icon">✓</div>
+
+              <div className="request-info">
+                <strong>SR-1021</strong>
+                <span>M-301 · Site C</span>
+              </div>
+
+              <span className="status active">
+                Completed
+              </span>
+            </div>
+
+            <div className="request-row">
+              <div className="machine-icon">✓</div>
+
+              <div className="request-info">
+                <strong>SR-1020</strong>
+                <span>M-208 · Site B</span>
+              </div>
+
+              <span className="status active">
+                Completed
+              </span>
+            </div>
+
+            <div className="request-row">
+              <div className="machine-icon">✓</div>
+
+              <div className="request-info">
+                <strong>SR-1018</strong>
+                <span>M-104 · Site A</span>
+              </div>
+
+              <span className="status active">
+                Completed
+              </span>
+            </div>
+          </div>
+        </section>
+      </main>
+    );
+  };
+
+  /* =========================
+     PAGE SWITCHING
+  ========================= */
+
+  const renderPage = () => {
+    switch (page) {
+      case "service-requests":
+        return <ServiceRequests />;
+
+      case "technicians":
+        return <Technicians />;
+
+      case "spare-parts":
+        return <SpareParts />;
+
+      case "notifications":
+        return <Notifications />;
+
+      case "equipment":
+        return <Equipment />;
+
+      case "service-history":
+        return <ServiceHistory />;
+
+      case "dashboard":
+      default:
+        return <Dashboard />;
+    }
+  };
+
+  /* =========================
+     FINAL APP
+  ========================= */
+
+  return (
+    <div className="app">
+      <Sidebar />
+
+      {renderPage()}
     </div>
   );
 }

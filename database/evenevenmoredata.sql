@@ -1135,16 +1135,6 @@ INSERT INTO request_parts (request_id,part_id,quantity_required,quantity_used) V
 ((SELECT request_id FROM service_requests WHERE machine_id=(SELECT machine_id FROM machines WHERE machine_code='BM-0100') ORDER BY request_id DESC LIMIT 1),(SELECT part_id FROM spare_parts WHERE part_code='BP-0100'),1,0);
 
 COMMIT;
-
--- QUICK CHECKS
-SELECT COUNT(*) AS total_users FROM users;
-SELECT COUNT(*) AS total_sites FROM sites;
-SELECT COUNT(*) AS total_machines FROM machines;
-SELECT COUNT(*) AS total_technicians FROM technicians;
-SELECT COUNT(*) AS total_skills FROM skills;
-SELECT COUNT(*) AS total_technician_skills FROM technician_skills;
-SELECT COUNT(*) AS total_service_requests FROM service_requests;
-SELECT COUNT(*) AS total_assignments FROM assignments;
 SELECT COUNT(*) AS total_spare_parts FROM spare_parts;
 SELECT COUNT(*) AS total_inventory_rows FROM part_inventory;
 SELECT COUNT(*) AS total_request_parts FROM request_parts;

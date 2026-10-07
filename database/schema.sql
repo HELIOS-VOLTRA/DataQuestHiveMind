@@ -75,3 +75,27 @@ CREATE TABLE machines (
     FOREIGN KEY (site_id)
         REFERENCES sites(site_id)
 );
+-- ============================================
+-- TECHNICIANS
+-- Stores technician-specific information
+-- Each technician is linked to a user account
+-- ============================================
+
+CREATE TABLE technicians (
+    technician_id INT AUTO_INCREMENT PRIMARY KEY,
+
+    user_id INT NOT NULL UNIQUE,
+
+    phone VARCHAR(20),
+
+    availability_status VARCHAR(50) NOT NULL DEFAULT 'Available',
+
+    latitude DECIMAL(10, 7),
+
+    longitude DECIMAL(10, 7),
+
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+    FOREIGN KEY (user_id)
+        REFERENCES users(user_id)
+);

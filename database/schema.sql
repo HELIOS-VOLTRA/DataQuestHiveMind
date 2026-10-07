@@ -198,3 +198,21 @@ CREATE TABLE assignments (
     FOREIGN KEY (technician_id)
         REFERENCES technicians(technician_id)
 );
+-- ============================================
+-- SPARE PARTS
+-- Stores spare parts/resources used for servicing
+-- ============================================
+
+CREATE TABLE spare_parts (
+    part_id INT AUTO_INCREMENT PRIMARY KEY,
+
+    part_code VARCHAR(50) NOT NULL UNIQUE,
+
+    part_name VARCHAR(100) NOT NULL,
+
+    description VARCHAR(255),
+
+    unit VARCHAR(30) DEFAULT 'Piece',
+
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);

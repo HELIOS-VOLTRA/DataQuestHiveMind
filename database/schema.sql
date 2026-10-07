@@ -132,3 +132,40 @@ CREATE TABLE technician_skills (
     FOREIGN KEY (skill_id)
         REFERENCES skills(skill_id)
 );
+-- ============================================
+-- SERVICE REQUESTS
+-- Stores maintenance/service requests
+-- created for industrial machines
+-- ============================================
+
+CREATE TABLE service_requests (
+    request_id INT AUTO_INCREMENT PRIMARY KEY,
+
+    machine_id INT NOT NULL,
+
+    requested_by INT NOT NULL,
+
+    issue_description TEXT NOT NULL,
+
+    priority VARCHAR(20) NOT NULL DEFAULT 'Medium',
+
+    status VARCHAR(50) NOT NULL DEFAULT 'Pending',
+
+    required_skill_id INT,
+
+    sla_deadline TIMESTAMP NULL,
+
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        ON UPDATE CURRENT_TIMESTAMP,
+
+    FOREIGN KEY (machine_id)
+        REFERENCES machines(machine_id),
+
+    FOREIGN KEY (requested_by)
+        REFERENCES users(user_id),
+
+    FOREIGN KEY (required_skill_id)
+        REFERENCES skills(skill_id)
+);

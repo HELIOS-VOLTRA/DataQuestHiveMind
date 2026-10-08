@@ -10,6 +10,114 @@ import Equipment from "./Equipment";
 import Landing from "./pages/Landing";
 
 function Dashboard({ setActivePage }) {
+  const API_BASE =
+    import.meta.env.VITE_API_URL ||
+    "http://localhost:5000";
+
+  const [requests, setRequests] = useState([]);
+  const [technicians, setTechnicians] = useState([]);
+  const [machines, setMachines] = useState([]);
+  const [parts, setParts] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    const loadDashboard = async () => {
+      try {
+        setLoading(true);
+        setError("");
+
+        const responses = await Promise.all([
+          fetch(`${API_BASE}/api/service-requests`),
+          fetch(`${API_BASE}/api/technicians`),
+          fetch(`${API_BASE}/api/machines`),
+          fetch(`${API_BASE}/api/spare-parts`)
+        ]);
+
+        if (responses.some((response) => !response.ok)) {
+          throw new Error("Failed to load dashboard data");
+        }
+
+        const [
+          requestsData,
+          techniciansData,
+          machinesData,
+          partsData
+        ] = await Promise.all(
+          responses.map((response) => response.json())
+        );
+
+        if (
+          !requestsData.success ||
+          !techniciansData.success ||
+          !machinesData.success ||
+          !partsData.success
+        ) {
+          throw new Error("One or more dashboard APIs returned an error");
+        }
+
+        setRequests(requestsData.service_requests || []);
+        setTechnicians(techniciansData.technicians || []);
+        setMachines(machinesData.machines || []);
+        setParts(partsData.parts || []);
+      } catch (err) {
+        console.error("Dashboard error:", err);
+        setError(err.message || "Unable to load dashboard");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadDashboard();
+  }, [API_BASE]);
+
+  const openRequests = requests.filter(
+    (request) =>
+      String(request.status || "").toLowerCase() !== "completed"
+  ).length;
+
+  const activeTechnicians = technicians.filter((technician) => {
+    const status = String(
+      technician.availability_status ||
+      technician.status ||
+      ""
+    ).toLowerCase();
+
+    return ["available", "on duty", "ready"].includes(status);
+  }).length;
+
+  const lowStockParts = parts.filter(
+    (part) => part.status === "LOW STOCK"
+  ).length;
+
+  const urgentRequests = requests.filter(
+    (request) =>
+      String(request.priority || "").toLowerCase() === "urgent"
+  ).length;
+
+  const inProgressRequests = requests.filter(
+    (request) =>
+      String(request.status || "").toLowerCase() === "in progress"
+  ).length;
+
+  const machinesNeedingAttention = machines.filter((machine) => {
+    const status = String(
+      machine.status ||
+      machine.machine_status ||
+      ""
+    ).toLowerCase();
+
+    return !["operational", "online", "active"].includes(status);
+  }).length;
+
+  const recentRequests = [...requests]
+    .sort(
+      (a, b) =>
+        new Date(b.created_at || 0).getTime() -
+        new Date(a.created_at || 0).getTime()
+    )
+    .slice(0, 3);
+
   return (
     <div className="page-container">
       <div className="page-header">
@@ -22,28 +130,38 @@ function Dashboard({ setActivePage }) {
         </div>
       </div>
 
+      {error && (
+        <div
+          className="dashboard-card"
+          style={{ marginBottom: "14px" }}
+        >
+          <strong>Dashboard API Error</strong>
+          <p>{error}</p>
+        </div>
+      )}
+
       <div className="stats-grid">
         <div className="stat-card">
           <span className="stat-label">Open Requests</span>
-          <strong>12</strong>
+          <strong>{loading ? "—" : openRequests}</strong>
           <span className="stat-subtitle">Needs attention</span>
         </div>
 
         <div className="stat-card">
           <span className="stat-label">Active Technicians</span>
-          <strong>8</strong>
+          <strong>{loading ? "—" : activeTechnicians}</strong>
           <span className="stat-subtitle">Currently available</span>
         </div>
 
         <div className="stat-card">
           <span className="stat-label">Equipment</span>
-          <strong>24</strong>
+          <strong>{loading ? "—" : machines.length}</strong>
           <span className="stat-subtitle">Tracked machines</span>
         </div>
 
         <div className="stat-card">
           <span className="stat-label">Low Stock Parts</span>
-          <strong>5</strong>
+          <strong>{loading ? "—" : lowStockParts}</strong>
           <span className="stat-subtitle">Replenishment required</span>
         </div>
       </div>
@@ -80,22 +198,22 @@ function Dashboard({ setActivePage }) {
 
           <div className="overview-row">
             <span>Urgent Requests</span>
-            <strong>2</strong>
+            <strong>{loading ? "—" : urgentRequests}</strong>
           </div>
 
           <div className="overview-row">
             <span>Requests In Progress</span>
-            <strong>4</strong>
+            <strong>{loading ? "—" : inProgressRequests}</strong>
           </div>
 
           <div className="overview-row">
             <span>Available Technicians</span>
-            <strong>6</strong>
+            <strong>{loading ? "—" : activeTechnicians}</strong>
           </div>
 
           <div className="overview-row">
             <span>Machines Requiring Attention</span>
-            <strong>3</strong>
+            <strong>{loading ? "—" : machinesNeedingAttention}</strong>
           </div>
         </div>
       </div>
@@ -103,41 +221,63 @@ function Dashboard({ setActivePage }) {
       <div className="dashboard-card">
         <h2>Recent Activity</h2>
 
-        <div className="activity-list">
-          <div className="activity-item">
-            <span className="activity-dot urgent"></span>
-
-            <div>
-              <strong>Urgent service request</strong>
-              <p>CNC Machine M-102 requires immediate attention.</p>
+        {loading ? (
+          <div className="activity-list">
+            <div className="activity-item">
+              <div>
+                <strong>Loading live activity...</strong>
+                <p>Fetching the latest service requests.</p>
+              </div>
             </div>
           </div>
-
-          <div className="activity-item">
-            <span className="activity-dot"></span>
-
-            <div>
-              <strong>Technician assigned</strong>
-              <p>Technician assignment updated for SR-1002.</p>
+        ) : recentRequests.length === 0 ? (
+          <div className="activity-list">
+            <div className="activity-item">
+              <div>
+                <strong>No recent requests</strong>
+                <p>No service activity is currently available.</p>
+              </div>
             </div>
           </div>
+        ) : (
+          <div className="activity-list">
+            {recentRequests.map((request, index) => (
+              <div
+                className="activity-item"
+                key={request.request_id || index}
+              >
+                <span
+                  className={`activity-dot ${
+                    String(request.priority || "").toLowerCase() === "urgent"
+                      ? "urgent"
+                      : String(request.status || "").toLowerCase() === "pending"
+                        ? "warning"
+                        : ""
+                  }`}
+                ></span>
 
-          <div className="activity-item">
-            <span className="activity-dot warning"></span>
+                <div>
+                  <strong>
+                    {String(
+                      request.status || "Service request"
+                    ).toUpperCase()}
+                  </strong>
 
-            <div>
-              <strong>Low stock alert</strong>
-              <p>
-                Hydraulic Seal Kit has reached its minimum stock level.
-              </p>
-            </div>
+                  <p>
+                    {request.machine_name ||
+                      request.machine_code ||
+                      `Machine ${request.machine_id || "—"}`}{" "}
+                    — {request.issue_description || "Maintenance request"}
+                  </p>
+                </div>
+              </div>
+            ))}
           </div>
-        </div>
+        )}
       </div>
     </div>
   );
 }
-
 function ServiceHistory() {
   const API_BASE =
     import.meta.env.VITE_API_URL ||
@@ -182,7 +322,7 @@ function ServiceHistory() {
   }, [API_BASE]);
 
   const formatDate = (dateString) => {
-    if (!dateString) return "—";
+    if (!dateString) return "â€”";
 
     const date = new Date(dateString);
 
@@ -194,7 +334,7 @@ function ServiceHistory() {
   };
 
   const calculateDuration = (start, end) => {
-    if (!start || !end) return "—";
+    if (!start || !end) return "â€”";
 
     const startTime = new Date(start);
     const endTime = new Date(end);
@@ -310,42 +450,42 @@ function App() {
     {
       id: "dashboard",
       label: "Dashboard",
-      icon: "▦",
+      icon: "â–¦",
     },
     {
       id: "service-requests",
       label: "Service Requests",
-      icon: "📋",
+      icon: "ðŸ“‹",
     },
     {
       id: "equipment",
       label: "Equipment",
-      icon: "⚙",
+      icon: "âš™",
     },
     {
       id: "technicians",
       label: "Technicians",
-      icon: "👨‍🔧",
+      icon: "ðŸ‘¨â€ðŸ”§",
     },
     {
       id: "spare-parts",
       label: "Spare Parts",
-      icon: "📦",
+      icon: "ðŸ“¦",
     },
     {
       id: "notifications",
       label: "Notifications",
-      icon: "🔔",
+      icon: "ðŸ””",
     },
     {
       id: "service-history",
       label: "Service History",
-      icon: "🕘",
+      icon: "ðŸ•˜",
     },
     {
       id: "smart-operations",
       label: "HiveMind Intelligence",
-      icon: "🧠",
+      icon: "ðŸ§ ",
     },
   ];
 
@@ -504,3 +644,5 @@ function App() {
 }
 
 export default App;
+
+

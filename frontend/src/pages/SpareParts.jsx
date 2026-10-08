@@ -1,227 +1,182 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import "./HiveMindPage.css";
 
+const API_BASE =
+  import.meta.env.VITE_API_URL ||
+  "http://localhost:5000";
 
 function SpareParts() {
+  const [parts, setParts] = useState([]);
+  const [search, setSearch] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
-  const [parts] = useState([
+  useEffect(() => {
+    const loadParts = async () => {
+      try {
+        setLoading(true);
+        setError("");
 
-    {
-      id: "P-001",
-      name: "Hydraulic Seal Kit",
-      category: "Hydraulics",
-      stock: 3,
-      minimum: 5,
-      status: "LOW STOCK"
-    },
+        const response = await fetch(`${API_BASE}/api/spare-parts`);
 
-    {
-      id: "P-002",
-      name: "CNC Spindle Bearing",
-      category: "CNC",
-      stock: 8,
-      minimum: 4,
-      status: "AVAILABLE"
-    },
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}`);
+        }
 
-    {
-      id: "P-003",
-      name: "Pressure Sensor",
-      category: "Sensors",
-      stock: 12,
-      minimum: 5,
-      status: "AVAILABLE"
-    },
+        const data = await response.json();
 
-    {
-      id: "P-004",
-      name: "Motor Coupling",
-      category: "Mechanical",
-      stock: 2,
-      minimum: 4,
-      status: "LOW STOCK"
-    },
+        if (!data.success) {
+          throw new Error(data.error || "Failed to load inventory");
+        }
 
-    {
-      id: "P-005",
-      name: "Air Filter",
-      category: "Compressor",
-      stock: 15,
-      minimum: 5,
-      status: "AVAILABLE"
-    },
+        setParts(data.parts || []);
+      } catch (err) {
+        console.error("Inventory load failed:", err);
+        setError(err.message || "Unable to load inventory");
+      } finally {
+        setLoading(false);
+      }
+    };
 
-    {
-      id: "P-006",
-      name: "Drive Belt",
-      category: "Mechanical",
-      stock: 7,
-      minimum: 3,
-      status: "AVAILABLE"
-    }
+    loadParts();
+  }, []);
 
-  ]);
+  const filteredParts = parts.filter((part) => {
+    const text = `
+      ${part.part_name}
+      ${part.part_code}
+      ${part.description || ""}
+      ${part.unit || ""}
+    `.toLowerCase();
 
+    return text.includes(search.toLowerCase());
+  });
 
-  const [search, setSearch] =
-    useState("");
+  const lowStock = parts.filter(
+    (part) => part.status === "LOW STOCK"
+  ).length;
 
+  const available = parts.filter(
+    (part) => part.status === "AVAILABLE"
+  ).length;
 
-  const filteredParts =
-    parts.filter((part) => {
+  const totalUnits = parts.reduce(
+    (total, part) => total + Number(part.stock_quantity || 0),
+    0
+  );
 
-      const text = `
-
-        ${part.name}
-
-        ${part.category}
-
-        ${part.id}
-
-      `.toLowerCase();
-
-      return text.includes(
-        search.toLowerCase()
-      );
-
-    });
-
-
-  const lowStock =
-    parts.filter(
-      (part) =>
-        part.stock <= part.minimum
-    ).length;
-
+  const stockHealth =
+    parts.length > 0
+      ? Math.round((available / parts.length) * 100)
+      : 0;
 
   return (
-
     <div className="hm-page">
-
       <div className="hm-header">
-
         <div>
-
           <span className="hm-kicker">
             RESOURCE INTELLIGENCE / 05
           </span>
 
-          <h1>
-            Inventory
-          </h1>
+          <h1>Inventory</h1>
 
           <p>
             Monitor spare-part availability, stock levels
             and replenishment risk.
           </p>
-
         </div>
-
 
         <button className="hm-button">
           + ADD PART
         </button>
-
       </div>
 
+      {error && (
+        <div
+          className="hm-panel"
+          style={{
+            marginTop: "14px",
+            borderColor: "#ffcc00",
+          }}
+        >
+          <span className="hm-warning">
+            INVENTORY API ERROR
+          </span>
+
+          <p>{error}</p>
+        </div>
+      )}
 
       <div className="hm-grid hm-grid-4">
-
         <div className="hm-metric">
-
           <span className="hm-metric-label">
             TOTAL PARTS
           </span>
 
           <strong className="hm-metric-value">
-            {parts.length}
+            {loading ? "—" : parts.length}
           </strong>
 
           <span className="hm-metric-note">
             Registered inventory
           </span>
-
         </div>
 
-
         <div className="hm-metric">
-
           <span className="hm-metric-label">
             AVAILABLE
           </span>
 
           <strong className="hm-metric-value">
-            {
-              parts.filter(
-                (part) =>
-                  part.stock >
-                  part.minimum
-              ).length
-            }
+            {loading ? "—" : available}
           </strong>
 
           <span className="hm-metric-note">
             Healthy stock
           </span>
-
         </div>
 
-
         <div className="hm-metric">
-
           <span className="hm-metric-label">
             LOW STOCK
           </span>
 
           <strong className="hm-metric-value hm-warning">
-            {lowStock}
+            {loading ? "—" : lowStock}
           </strong>
 
           <span className="hm-metric-note">
             Replenishment required
           </span>
-
         </div>
 
-
         <div className="hm-metric">
-
           <span className="hm-metric-label">
-            FORECAST
+            STOCK HEALTH
           </span>
 
           <strong className="hm-metric-value">
-            73%
+            {loading ? "—" : `${stockHealth}%`}
           </strong>
 
           <span className="hm-metric-note">
-            Highest stockout risk
+            {totalUnits.toLocaleString()} units available
           </span>
-
         </div>
-
       </div>
-
 
       <div
         className="hm-panel"
         style={{ marginTop: "14px" }}
       >
-
         <div className="hm-panel-header">
-
           <div>
-
             <span className="hm-panel-label">
               INVENTORY MATRIX
             </span>
 
-            <h2>
-              Parts Registry
-            </h2>
-
+            <h2>Parts Registry</h2>
           </div>
-
 
           <input
             placeholder="SEARCH PART..."
@@ -230,151 +185,154 @@ function SpareParts() {
               setSearch(event.target.value)
             }
             style={{
-              maxWidth: "240px"
+              maxWidth: "240px",
             }}
           />
-
         </div>
 
-
-        {filteredParts.map((part) => (
-
+        {loading ? (
           <div
             className="hm-data-row"
-            key={part.id}
+            style={{ justifyContent: "center" }}
           >
-
-            <div>
-
-              <span className="hm-data-label">
-                PART
-              </span>
-
-              <div className="hm-data-value">
-                {part.name}
-              </div>
-
-              <small
-                style={{
-                  color: "#555"
-                }}
-              >
-                {part.id}
-              </small>
-
+            <div className="hm-data-value">
+              LOADING INVENTORY...
             </div>
-
-
-            <div>
-
-              <span className="hm-data-label">
-                CATEGORY
-              </span>
-
-              <div className="hm-data-value">
-                {part.category}
-              </div>
-
-            </div>
-
-
-            <div>
-
-              <span className="hm-data-label">
-                STOCK
-              </span>
-
-              <div
-                className={`hm-data-value ${
-                  part.stock <=
-                  part.minimum
-                    ? "hm-warning"
-                    : ""
-                }`}
-              >
-                {part.stock}
-              </div>
-
-            </div>
-
-
-            <div>
-
-              <span className="hm-data-label">
-                STATUS
-              </span>
-
-              <span
-                className={`hm-status ${
-                  part.stock <=
-                  part.minimum
-                    ? "hm-warning"
-                    : "hm-good"
-                }`}
-              >
-                {part.status}
-              </span>
-
-            </div>
-
           </div>
+        ) : filteredParts.length === 0 ? (
+          <div
+            className="hm-data-row"
+            style={{ justifyContent: "center" }}
+          >
+            <div className="hm-data-value">
+              NO PARTS FOUND
+            </div>
+          </div>
+        ) : (
+          filteredParts.map((part) => (
+            <div
+              className="hm-data-row"
+              key={part.part_id}
+            >
+              <div>
+                <span className="hm-data-label">
+                  PART
+                </span>
 
-        ))}
+                <div className="hm-data-value">
+                  {part.part_name}
+                </div>
 
+                <small style={{ color: "#555" }}>
+                  {part.part_code}
+                </small>
+              </div>
+
+              <div>
+                <span className="hm-data-label">
+                  DESCRIPTION
+                </span>
+
+                <div className="hm-data-value">
+                  {part.description || "—"}
+                </div>
+              </div>
+
+              <div>
+                <span className="hm-data-label">
+                  STOCK
+                </span>
+
+                <div
+                  className={`hm-data-value ${
+                    part.status === "LOW STOCK"
+                      ? "hm-warning"
+                      : ""
+                  }`}
+                >
+                  {part.stock_quantity} {part.unit || ""}
+                </div>
+
+                <small style={{ color: "#555" }}>
+                  MIN: {part.minimum_stock}
+                </small>
+              </div>
+
+              <div>
+                <span className="hm-data-label">
+                  STATUS
+                </span>
+
+                <span
+                  className={`hm-status ${
+                    part.status === "LOW STOCK"
+                      ? "hm-warning"
+                      : "hm-good"
+                  }`}
+                >
+                  {part.status}
+                </span>
+              </div>
+            </div>
+          ))
+        )}
       </div>
-
 
       <div
         className="hm-panel"
         style={{ marginTop: "14px" }}
       >
-
         <span className="hm-panel-label">
-          HIVEMIND SUPPLY FORECAST
+          HIVEMIND SUPPLY ANALYSIS
         </span>
 
         <h2>
-          Hydraulic Seal Kit
+          {lowStock > 0
+            ? `${lowStock} parts require replenishment`
+            : "Inventory levels are healthy"}
         </h2>
 
         <p>
-          Predicted stockout probability
+          Current stock health is based directly on
+          available inventory versus configured minimum
+          stock levels.
         </p>
 
-        <strong className="hm-metric-value hm-warning">
-          73%
+        <strong
+          className={`hm-metric-value ${
+            lowStock > 0 ? "hm-warning" : ""
+          }`}
+        >
+          {loading ? "—" : `${stockHealth}%`}
         </strong>
 
         <div className="hm-progress">
-
           <span
             style={{
-              width: "73%"
+              width: `${stockHealth}%`,
             }}
           />
-
         </div>
 
         <p>
-          Recommendation: replenish before the
-          next hydraulic service cycle.
+          {lowStock > 0
+            ? `Recommendation: review ${lowStock} low-stock part${
+                lowStock === 1 ? "" : "s"
+              } before the next service cycle.`
+            : "Recommendation: continue monitoring inventory levels."}
         </p>
 
         <button
           className="hm-button"
           style={{
-            marginTop: "10px"
+            marginTop: "10px",
           }}
         >
           GENERATE REPLENISHMENT
         </button>
-
       </div>
-
     </div>
-
   );
 }
-
 
 export default SpareParts;

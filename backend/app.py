@@ -8,7 +8,7 @@ from db.connection import get_db_connection
 app = Flask(__name__)
 
 # Allow the React frontend to communicate with Flask
-CORS(app)
+CORS(app, supports_private_network=True)
 
 
 # =========================================================
@@ -1504,9 +1504,77 @@ def get_service_history():
         if conn:
             conn.close()
 
+# GET ALL SPARE PARTS + INVENTORY
+@app.route("/api/spare-parts", methods=["GET"])
+def get_spare_parts():
+    conn = None
+    cursor = None
+
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor(dictionary=True)
+
+        cursor.execute("""
+            SELECT
+                sp.part_id,
+                sp.part_code,
+                sp.part_name,
+                sp.description,
+                sp.unit,
+                COALESCE(SUM(pi.quantity_available), 0) AS stock_quantity,
+                COALESCE(MAX(pi.minimum_stock_level), 0) AS minimum_stock
+            FROM spare_parts sp
+            LEFT JOIN part_inventory pi
+                ON sp.part_id = pi.part_id
+            GROUP BY
+                sp.part_id,
+                sp.part_code,
+                sp.part_name,
+                sp.description,
+                sp.unit
+            ORDER BY sp.part_id
+        """)
+
+        parts = cursor.fetchall()
+
+        for part in parts:
+            stock = int(part["stock_quantity"] or 0)
+            minimum = int(part["minimum_stock"] or 0)
+
+            part["stock_quantity"] = stock
+            part["minimum_stock"] = minimum
+
+            part["status"] = (
+                "LOW STOCK"
+                if stock <= minimum
+                else "AVAILABLE"
+            )
+
+            
+
+        return jsonify({
+            "success": True,
+            "count": len(parts),
+            "parts": parts
+        }), 200
+
+    except Exception as e:
+        return jsonify({
+            "success": False,
+            "error": str(e)
+        }), 500
+
+    finally:
+        if cursor:
+            cursor.close()
+        if conn:
+            conn.close()
+
 if __name__ == "__main__":
     app.run(
         host="0.0.0.0",
         port=5000,
         debug=True
     )
+
+
